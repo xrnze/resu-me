@@ -1,0 +1,60 @@
+import { useState } from 'react';
+
+const questions = [
+  {
+    question: 'Is my data secure?',
+    answer: '',
+  },
+  {
+    question: 'Does it work for tech jobs?',
+    answer: 'Yes. We specialize in tech, finance, and marketing sectors where ATS systems are most aggressive.',
+  },
+  {
+    question: 'Can I use it more than once?',
+    answer: '',
+  },
+];
+
+export function Questions() {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  const toggle = (index: number) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
+
+  return (
+    <section id="faq" className="px-8 md:px-16 py-xl bg-surface border-t-4 border-black">
+      <h2 className="font-headline-lg text-headline-lg uppercase text-black mb-lg">Questions?</h2>
+      <div className="max-w-4xl space-y-sm">
+        {questions.map((q, index) => {
+          const isOpen = openIndex === index;
+          return (
+            <div
+              key={index}
+              className={`border-4 border-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${
+                isOpen ? 'bg-primary-container' : 'bg-white'
+              }`}
+            >
+              <div
+                className="flex justify-between items-center cursor-pointer"
+                onClick={() => toggle(index)}
+              >
+                <h4 className="font-headline-md text-headline-md uppercase text-black">
+                  {q.question}
+                </h4>
+                <span className="material-symbols-outlined text-4xl text-black">
+                  {isOpen ? 'remove' : 'add'}
+                </span>
+              </div>
+              {isOpen && q.answer && (
+                <div className="font-body-md mt-4 text-black border-t-2 border-black pt-4">
+                  {q.answer}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
