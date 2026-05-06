@@ -1,7 +1,9 @@
 export function SuccessStories() {
   return (
     <section id="reviews" className="px-8 md:px-16 py-xl bg-[#E0BBE4]">
-      <h2 className="font-headline-lg text-headline-lg uppercase text-black mb-lg">Success Stories</h2>
+      <h2 className="font-headline-lg text-headline-lg uppercase text-black mb-lg">
+        Success Stories
+      </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
         {/* Mark R. */}
         <div className="bg-white border-4 border-black p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] space-y-sm">
@@ -14,18 +16,46 @@ export function SuccessStories() {
               />
             </div>
             <div>
-              <p className="font-label-bold uppercase text-black">MARK R. — Senior Developer</p>
+              <p className="font-label-bold uppercase text-black">
+                MARK R. — Senior Developer
+              </p>
               <div className="flex text-black">
-                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                <span
+                  className="material-symbols-outlined"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                >
+                  star
+                </span>
+                <span
+                  className="material-symbols-outlined"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                >
+                  star
+                </span>
+                <span
+                  className="material-symbols-outlined"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                >
+                  star
+                </span>
+                <span
+                  className="material-symbols-outlined"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                >
+                  star
+                </span>
+                <span
+                  className="material-symbols-outlined"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                >
+                  star
+                </span>
               </div>
             </div>
           </div>
           <p className="font-body-lg italic text-black">
-            &quot;I went from 0 callbacks to 5 interviews in one week. The ATS score prediction is scary accurate. Worth every penny.&quot;
+            &quot;I went from 0 callbacks to 5 interviews in one week. The ATS
+            score prediction is scary accurate. Worth every penny.&quot;
           </p>
         </div>
 
@@ -40,18 +70,46 @@ export function SuccessStories() {
               />
             </div>
             <div>
-              <p className="font-label-bold uppercase text-black">SARAH L. — Marketing Lead</p>
+              <p className="font-label-bold uppercase text-black">
+                SARAH L. — Marketing Lead
+              </p>
               <div className="flex text-black">
-                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                <span
+                  className="material-symbols-outlined"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                >
+                  star
+                </span>
+                <span
+                  className="material-symbols-outlined"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                >
+                  star
+                </span>
+                <span
+                  className="material-symbols-outlined"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                >
+                  star
+                </span>
+                <span
+                  className="material-symbols-outlined"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                >
+                  star
+                </span>
+                <span
+                  className="material-symbols-outlined"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                >
+                  star
+                </span>
               </div>
             </div>
           </div>
           <p className="font-body-lg italic text-black">
-            &quot;The format optimization made my old resume look like a joke. The engine is fast, brutal, and effective.&quot;
+            &quot;The format optimization made my old resume look like a joke.
+            The engine is fast, brutal, and effective.&quot;
           </p>
         </div>
       </div>

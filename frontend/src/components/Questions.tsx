@@ -3,7 +3,7 @@ import { useState } from 'react';
 const questions = [
   {
     question: 'Is my data secure?',
-    answer: '',
+    answer: 'Your resume and job description are sent securely to our analysis engine and never stored on our servers. We don\'t keep copies of your data after the analysis completes.',
   },
   {
     question: 'Does it work for tech jobs?',
@@ -11,7 +11,7 @@ const questions = [
   },
   {
     question: 'Can I use it more than once?',
-    answer: '',
+    answer: 'Absolutely. There\'s no limit — analyze as many resumes and job descriptions as you need, completely free.',
   },
 ];
 

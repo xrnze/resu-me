@@ -1,9 +1,14 @@
+import { Link } from "@tanstack/react-router";
+
 export function Header() {
   return (
     <header className="sticky top-0 w-full border-b-4 border-black z-50 bg-[#FFDAB9] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex justify-between items-center h-24 px-8 md:px-16">
-      <div className="text-2xl font-black italic tracking-tighter uppercase text-black">
+      <Link
+        to="/"
+        className="text-2xl font-black italic tracking-tighter uppercase text-black hover:opacity-70 transition-opacity"
+      >
         RESUME_ENGINE
-      </div>
+      </Link>
       <nav className="hidden md:flex gap-8 items-center">
         <a
           href="#features"
@@ -30,9 +35,12 @@ export function Header() {
           FAQ
         </a>
       </nav>
-      <button className="bg-black text-white font-['Space_Grotesk'] font-black uppercase px-6 py-3 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all">
+      <Link
+        to="/analyze"
+        className="hidden md:inline-block bg-black text-white font-['Space_Grotesk'] font-black uppercase px-6 py-3 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
+      >
         ANALYZE NOW
-      </button>
+      </Link>
     </header>
   );
 }
