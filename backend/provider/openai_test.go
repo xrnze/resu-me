@@ -23,6 +23,6 @@ func TestOpenAIClient_Chat_HTTPError(t *testing.T) {
 	defer server.Close()
 
 	client := NewOpenAIClient("bad-key", server.URL, "test-model")
-	_, err := client.Chat(context.Background(), "system", "user")
+	_, err := client.Chat(context.Background(), "test prompt")
 	assert.Error(t, err)
 }

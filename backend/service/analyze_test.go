@@ -15,25 +15,21 @@ type mockLLMClient struct {
 	err      error
 }
 
-func (m *mockLLMClient) Chat(ctx context.Context, systemPrompt, userPrompt string) (string, error) {
+func (m *mockLLMClient) Chat(ctx context.Context, prompt string) (string, error) {
 	return m.response, m.err
 }
 
-func TestBuildSystemPrompt(t *testing.T) {
-	prompt := BuildSystemPrompt()
-	assert.True(t, strings.Contains(prompt, "JSON"), "system prompt should mention JSON")
-	assert.True(t, strings.Contains(prompt, "score"), "system prompt should mention score")
-	assert.True(t, strings.Contains(prompt, "missing_keywords"), "system prompt should mention missing_keywords")
-	assert.True(t, strings.Contains(prompt, "section_feedback"), "system prompt should mention section_feedback")
-	assert.True(t, strings.Contains(prompt, "rewrite_suggestions"), "system prompt should mention rewrite_suggestions")
-}
-
-func TestBuildUserPrompt(t *testing.T) {
+func TestBuildPrompt(t *testing.T) {
 	resume := "Experienced Go developer"
 	jd := "Senior backend role"
-	prompt := BuildUserPrompt(resume, jd)
-	assert.True(t, strings.Contains(prompt, resume), "user prompt should include resume text")
-	assert.True(t, strings.Contains(prompt, jd), "user prompt should include job description")
+	prompt := BuildPrompt(resume, jd)
+	assert.True(t, strings.Contains(prompt, resume), "prompt should include resume text")
+	assert.True(t, strings.Contains(prompt, jd), "prompt should include job description")
+	assert.True(t, strings.Contains(prompt, "JSON"), "prompt should mention JSON")
+	assert.True(t, strings.Contains(prompt, "score"), "prompt should mention score")
+	assert.True(t, strings.Contains(prompt, "missing_keywords"), "prompt should mention missing_keywords")
+	assert.True(t, strings.Contains(prompt, "section_feedback"), "prompt should mention section_feedback")
+	assert.True(t, strings.Contains(prompt, "rewrite_suggestions"), "prompt should mention rewrite_suggestions")
 }
 
 func TestAnalyze_ValidResponse(t *testing.T) {

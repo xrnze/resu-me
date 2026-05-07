@@ -4,13 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"resu-me/model"
 )
 
 type LLMClient interface {
-	Chat(ctx context.Context, systemPrompt, userPrompt string) (string, error)
+	Chat(ctx context.Context, prompt string) (string, error)
 }
 
 type AnalyzeService struct {
@@ -22,8 +23,8 @@ func NewAnalyzeService(client LLMClient, timeout time.Duration) *AnalyzeService 
 	return &AnalyzeService{client: client, timeout: timeout}
 }
 
-func BuildSystemPrompt() string {
-	return `You are a resume analysis assistant. Analyze how well a resume matches a job description and return ONLY valid JSON with this exact schema:
+func BuildPrompt(resumeText, jobDescription string) string {
+	prompt := `You are a resume analysis assistant. Analyze how well a resume matches a job description and return ONLY valid JSON with this exact schema:
 {
   "score": <number 0-100>,
   "missing_keywords": ["<keyword>", ...],
@@ -35,26 +36,37 @@ func BuildSystemPrompt() string {
   "rewrite_suggestions": ["<suggestion>", ...]
 }
 
+Resume:
+{{ .RESUME_TEXT }}
+
+Job Description:
+{{ .JOB_DESCRIPTION }}
+
+Scoring criteria:
+- 0-40: Poor match, major gaps
+- 41-70: Partial match, improvable
+- 71-90: Strong match, minor gaps
+- 91-100: Excellent match
+
 Rules:
 - Score 0-100 reflects how well the resume matches the job description.
 - missing_keywords lists skills/technologies from the job description not found in the resume.
 - section_feedback gives specific feedback on the summary, experience, and skills sections.
 - rewrite_suggestions provides actionable, specific improvements.
 - Return ONLY valid JSON. No markdown, no explanation, no code blocks.`
-}
 
-func BuildUserPrompt(resumeText, jobDescription string) string {
-	return fmt.Sprintf("Resume:\n%s\n\nJob Description:\n%s", resumeText, jobDescription)
+	prompt = strings.ReplaceAll(prompt, "{{ .RESUME_TEXT }}", resumeText)
+	prompt = strings.ReplaceAll(prompt, "{{ .JOB_DESCRIPTION }}", jobDescription)
+	return prompt
 }
 
 func (s *AnalyzeService) Analyze(ctx context.Context, resumeText, jobDescription string) (*model.AnalysisResponse, error) {
 	callCtx, cancel := context.WithTimeout(ctx, s.timeout)
 	defer cancel()
 
-	systemPrompt := BuildSystemPrompt()
-	userPrompt := BuildUserPrompt(resumeText, jobDescription)
+	prompt := BuildPrompt(resumeText, jobDescription)
 
-	raw, err := s.client.Chat(callCtx, systemPrompt, userPrompt)
+	raw, err := s.client.Chat(callCtx, prompt)
 	if err != nil {
 		return nil, fmt.Errorf("LLM call failed: %w", err)
 	}

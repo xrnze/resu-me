@@ -23,11 +23,10 @@ func NewOpenAIClient(apiKey, baseURL, model string) *OpenAIClient {
 	}
 }
 
-func (c *OpenAIClient) Chat(ctx context.Context, systemPrompt, userPrompt string) (string, error) {
+func (c *OpenAIClient) Chat(ctx context.Context, prompt string) (string, error) {
 	resp, err := c.client.Chat.Completions.New(ctx, openai.ChatCompletionNewParams{
 		Messages: []openai.ChatCompletionMessageParamUnion{
-			openai.SystemMessage(systemPrompt),
-			openai.UserMessage(userPrompt),
+			openai.UserMessage(prompt),
 		},
 		Model: c.model,
 	})
