@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"resu-me/model"
@@ -48,7 +49,7 @@ func TestAnalyze_ValidResponse(t *testing.T) {
 			"rewrite_suggestions": ["Add metrics", "Use action verbs"]
 		}`,
 	}
-	svc := &AnalyzeService{client: mock}
+	svc := &AnalyzeService{client: mock, timeout: 30 * time.Second}
 	resp, err := svc.Analyze(context.Background(), "resume", "job desc")
 	assert.NoError(t, err)
 	assert.Equal(t, 78, resp.Score)
@@ -60,7 +61,7 @@ func TestAnalyze_ValidResponse(t *testing.T) {
 
 func TestAnalyze_InvalidJSON(t *testing.T) {
 	mock := &mockLLMClient{response: "not json at all"}
-	svc := &AnalyzeService{client: mock}
+	svc := &AnalyzeService{client: mock, timeout: 30 * time.Second}
 	_, err := svc.Analyze(context.Background(), "resume", "job desc")
 	assert.Error(t, err, "expected error for invalid JSON")
 }
@@ -69,7 +70,7 @@ func TestAnalyze_MissingFields(t *testing.T) {
 	mock := &mockLLMClient{
 		response: `{"score": 50}`,
 	}
-	svc := &AnalyzeService{client: mock}
+	svc := &AnalyzeService{client: mock, timeout: 30 * time.Second}
 	_, err := svc.Analyze(context.Background(), "resume", "job desc")
 	assert.Error(t, err, "expected error for missing fields")
 }
@@ -94,10 +95,10 @@ func TestAnalyze_ScoreInRange(t *testing.T) {
 	tests := []int{0, 50, 100}
 	for _, score := range tests {
 		resp := model.AnalysisResponse{
-			Score:               score,
-			MissingKeywords:     []string{},
-			SectionFeedback:     model.SectionFeedback{Summary: "a", Experience: "b", Skills: "c"},
-			RewriteSuggestions:  []string{},
+			Score:              score,
+			MissingKeywords:    []string{},
+			SectionFeedback:    model.SectionFeedback{Summary: "a", Experience: "b", Skills: "c"},
+			RewriteSuggestions: []string{},
 		}
 		assert.NoError(t, validateResponse(&resp), "unexpected error for score %d", score)
 	}
@@ -105,9 +106,40 @@ func TestAnalyze_ScoreInRange(t *testing.T) {
 
 func TestAnalyze_LLMError(t *testing.T) {
 	mock := &mockLLMClient{err: assertError("network error")}
-	svc := &AnalyzeService{client: mock}
+	svc := &AnalyzeService{client: mock, timeout: 30 * time.Second}
 	_, err := svc.Analyze(context.Background(), "resume", "job desc")
 	assert.Error(t, err, "expected error from LLM")
+}
+
+func TestAnalyze_ContextTimeout(t *testing.T) {
+	mock := &mockLLMClient{
+		err: context.DeadlineExceeded,
+	}
+	svc := &AnalyzeService{client: mock, timeout: 1 * time.Millisecond}
+	_, err := svc.Analyze(context.Background(), "resume", "job desc")
+	assert.Error(t, err, "expected timeout error")
+}
+
+func TestAnalyze_NilMissingKeywords(t *testing.T) {
+	mock := &mockLLMClient{
+		response: `{"score": 50, "section_feedback": {"summary": "a", "experience": "b", "skills": "c"}}`,
+	}
+	svc := &AnalyzeService{client: mock, timeout: 30 * time.Second}
+	resp, err := svc.Analyze(context.Background(), "resume", "job desc")
+	assert.NoError(t, err)
+	assert.NotNil(t, resp.MissingKeywords)
+	assert.Equal(t, 0, len(resp.MissingKeywords))
+}
+
+func TestAnalyze_NilRewriteSuggestions(t *testing.T) {
+	mock := &mockLLMClient{
+		response: `{"score": 50, "missing_keywords": [], "section_feedback": {"summary": "a", "experience": "b", "skills": "c"}}`,
+	}
+	svc := &AnalyzeService{client: mock, timeout: 30 * time.Second}
+	resp, err := svc.Analyze(context.Background(), "resume", "job desc")
+	assert.NoError(t, err)
+	assert.NotNil(t, resp.RewriteSuggestions)
+	assert.Equal(t, 0, len(resp.RewriteSuggestions))
 }
 
 type assertError string

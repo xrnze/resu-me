@@ -26,6 +26,7 @@ type LLMConfig struct {
 	APIKey  string
 	BaseURL string
 	Model   string
+	Timeout time.Duration
 }
 
 type RateLimitConfig struct {
@@ -57,6 +58,11 @@ func Load() (*Config, error) {
 		return nil, fmt.Errorf("invalid RATE_LIMIT_TTL: %w", err)
 	}
 
+	llmTimeout, err := parseDurationEnv("LLM_TIMEOUT", 30*time.Second)
+	if err != nil {
+		return nil, fmt.Errorf("invalid LLM_TIMEOUT: %w", err)
+	}
+
 	readTimeout, err := parseDurationEnv("SERVER_READ_TIMEOUT", 30*time.Second)
 	if err != nil {
 		return nil, fmt.Errorf("invalid SERVER_READ_TIMEOUT: %w", err)
@@ -83,6 +89,7 @@ func Load() (*Config, error) {
 			APIKey:  apiKey,
 			BaseURL: getEnv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"),
 			Model:   getEnv("OPENROUTER_MODEL", "openai/gpt-oss-120b"),
+			Timeout: llmTimeout,
 		},
 		RateLimit: RateLimitConfig{
 			Rate:  rateLimitRate,

@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
+
 	"resu-me/model"
 )
 
@@ -12,11 +14,12 @@ type LLMClient interface {
 }
 
 type AnalyzeService struct {
-	client LLMClient
+	client  LLMClient
+	timeout time.Duration
 }
 
-func NewAnalyzeService(client LLMClient) *AnalyzeService {
-	return &AnalyzeService{client: client}
+func NewAnalyzeService(client LLMClient, timeout time.Duration) *AnalyzeService {
+	return &AnalyzeService{client: client, timeout: timeout}
 }
 
 func BuildSystemPrompt() string {
@@ -45,10 +48,13 @@ func BuildUserPrompt(resumeText, jobDescription string) string {
 }
 
 func (s *AnalyzeService) Analyze(ctx context.Context, resumeText, jobDescription string) (*model.AnalysisResponse, error) {
+	callCtx, cancel := context.WithTimeout(ctx, s.timeout)
+	defer cancel()
+
 	systemPrompt := BuildSystemPrompt()
 	userPrompt := BuildUserPrompt(resumeText, jobDescription)
 
-	raw, err := s.client.Chat(ctx, systemPrompt, userPrompt)
+	raw, err := s.client.Chat(callCtx, systemPrompt, userPrompt)
 	if err != nil {
 		return nil, fmt.Errorf("LLM call failed: %w", err)
 	}
@@ -71,6 +77,12 @@ func validateResponse(resp *model.AnalysisResponse) error {
 	}
 	if resp.SectionFeedback.Summary == "" || resp.SectionFeedback.Experience == "" || resp.SectionFeedback.Skills == "" {
 		return fmt.Errorf("section_feedback fields are required")
+	}
+	if resp.MissingKeywords == nil {
+		resp.MissingKeywords = []string{}
+	}
+	if resp.RewriteSuggestions == nil {
+		resp.RewriteSuggestions = []string{}
 	}
 	return nil
 }

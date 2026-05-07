@@ -26,13 +26,14 @@ func main() {
 	}
 
 	llmClient := provider.NewOpenAIClient(cfg.LLM.APIKey, cfg.LLM.BaseURL, cfg.LLM.Model)
-	analyzeSvc := service.NewAnalyzeService(llmClient)
+	analyzeSvc := service.NewAnalyzeService(llmClient, cfg.LLM.Timeout)
 	analyzeHandler := handler.NewAnalyzeHandler(analyzeSvc)
 
 	rl := service.NewRateLimiter(cfg.RateLimit.Rate, cfg.RateLimit.Burst, cfg.RateLimit.TTL)
 	defer rl.Stop()
 
 	r := mux.NewRouter()
+	r.Use(middleware.BodyLimit(100 * 1024))
 	r.Use(middleware.CORS)
 	r.Use(middleware.RateLimit(rl))
 
