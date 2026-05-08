@@ -18,7 +18,7 @@ export function SectionFeedbackCards({ feedback }: SectionFeedbackCardsProps) {
       <h2 className="font-['Space_Grotesk'] font-bold text-lg uppercase text-black mb-4">
         Section Feedback
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         {SECTIONS.map(({ key, label }) => (
           <div key={key} className="card-neo">
             <h3 className="font-['Space_Grotesk'] font-bold text-base uppercase text-black mb-2">
