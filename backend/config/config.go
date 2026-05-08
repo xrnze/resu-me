@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"time"
@@ -36,7 +37,9 @@ type RateLimitConfig struct {
 }
 
 func Load() (*Config, error) {
-	godotenv.Load()
+	if err := godotenv.Load(); err != nil {
+		log.Printf("no .env file loaded (expected in Docker): %v", err)
+	}
 
 	apiKey := os.Getenv("OPENROUTER_API_KEY")
 	if apiKey == "" {
