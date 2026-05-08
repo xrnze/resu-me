@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -66,10 +67,12 @@ func (s *AnalyzeService) Analyze(ctx context.Context, resumeText, jobDescription
 
 	prompt := BuildPrompt(resumeText, jobDescription)
 
+	start := time.Now()
 	raw, err := s.client.Chat(callCtx, prompt)
 	if err != nil {
 		return nil, fmt.Errorf("LLM call failed: %w", err)
 	}
+	log.Printf("LLM request completed in %v", time.Since(start))
 
 	var resp model.AnalysisResponse
 	if err := json.Unmarshal([]byte(raw), &resp); err != nil {

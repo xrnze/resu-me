@@ -17,7 +17,7 @@ func TestLoad_Defaults(t *testing.T) {
 	assert.Equal(t, "8080", cfg.Server.Port)
 	assert.Equal(t, "https://openrouter.ai/api/v1", cfg.LLM.BaseURL)
 	assert.Equal(t, "openai/gpt-oss-120b", cfg.LLM.Model)
-	assert.Equal(t, 30*time.Second, cfg.LLM.Timeout)
+	assert.Equal(t, 60*time.Second, cfg.LLM.Timeout)
 	assert.Equal(t, 10.0, cfg.RateLimit.Rate)
 	assert.Equal(t, 3, cfg.RateLimit.Burst)
 	assert.Equal(t, 10*time.Minute, cfg.RateLimit.TTL)

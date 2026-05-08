@@ -58,7 +58,7 @@ func Load() (*Config, error) {
 		return nil, fmt.Errorf("invalid RATE_LIMIT_TTL: %w", err)
 	}
 
-	llmTimeout, err := parseDurationEnv("LLM_TIMEOUT", 30*time.Second)
+	llmTimeout, err := parseDurationEnv("LLM_TIMEOUT", 60*time.Second)
 	if err != nil {
 		return nil, fmt.Errorf("invalid LLM_TIMEOUT: %w", err)
 	}
