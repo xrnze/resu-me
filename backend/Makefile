@@ -1,4 +1,4 @@
-IMAGE_NAME=resu-me-backend
+IMAGE_NAME=resu-me_backend
 IMAGE_TAG=$(shell git rev-parse --short HEAD)
 
 .PHONY: test test-verbose test-coverage test-coverage-html build run vet fmt lint deps clean all docker-build

@@ -14,7 +14,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    image: resume-backend:${GIT_SHA:-latest}
+    image: resu-me_backend:${GIT_SHA:-latest}
     env_file:
       - ./backend/.env
     labels:
@@ -31,7 +31,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    image: resume-frontend:${GIT_SHA:-latest}
+    image: resu-me_frontend:${GIT_SHA:-latest}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
