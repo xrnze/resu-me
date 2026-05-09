@@ -6,8 +6,8 @@ Monorepo with two packages:
 
 | Package | Path | Stack |
 |---------|------|-------|
-| Frontend | `frontend/` | React 19 + TypeScript, Vite 8, Tailwind CSS v4, TanStack Router |
-| Backend | `backend/` | Go 1.25.0, gorilla/mux, OpenAI SDK, stateless |
+| Frontend | `frontend/` | React 19 + TypeScript, Vite 8, Tailwind CSS v4, TanStack Router (active — `/` + `/analyze`) |
+| Backend | `backend/` | Go 1.25.0, gorilla/mux, openai-go/v3 SDK (OpenRouter-compatible), in-memory rate limiter |
 
 ## Frontend (`frontend/`)
 
@@ -22,10 +22,10 @@ pnpm preview      # Preview production build
 ```
 
 ### Key Conventions
-- **State**: All UI state in `App.tsx` via `useState`. No global state library. Only exception: `ThemeContext`.
-- **Styling**: Tailwind CSS v4 (CSS-first). Theme uses CSS custom properties in `index.css` — do NOT use Tailwind's `dark:` classes.
-- **PDF.js worker**: Copied via `postinstall` hook to `public/pdf.worker.min.js`. After `pnpm install`, verify the file exists.
-- **Design system**: Neobrutalist (see `DESIGN.md`) — sharp corners, hard shadows, bold borders. Overrides the PRD's Vercel/Linear aesthetic.
+- **State**: All analyzer UI state in `src/routes/analyze.tsx` via `useState`. No global state library. Only exception: `ThemeContext`.
+- **Styling**: Tailwind CSS v4 (CSS-first). Theme uses CSS custom properties in `index.css` via `@theme` block — do NOT use Tailwind's `dark:` classes.
+- **PDF.js worker**: Copied via `postinstall` hook to `public/pdf.worker.min.js` (from `pdfjs-dist/build/pdf.worker.min.mjs`). After `pnpm install`, verify the file exists.
+- **Design system**: Neobrutalist (see `DESIGN.md`) — sharp corners, hard shadows, bold borders, Space Grotesk + Work Sans fonts.
 - **API contract**: `POST /api/analyze` → `{ score, missing_keywords, section_feedback, rewrite_suggestions }`. See `frontend/AGENTS.md` for full spec.
 
 ### File Boundaries
@@ -33,7 +33,7 @@ pnpm preview      # Preview production build
 - `src/lib/api.ts` — fetch wrapper to `/api/analyze`
 - `src/types/index.ts` — shared TypeScript types
 - `src/contexts/ThemeContext.tsx` — only context in the app
-- `src/routes/` — TanStack Router (installed but unused for now — single-page flow)
+- `src/routes/` — TanStack Router (active — `/` + `/analyze`)
 
 ## Backend (`backend/`)
 
@@ -50,12 +50,16 @@ go fmt ./...          # Format
 
 ### Architecture
 - **Router**: `github.com/gorilla/mux` — use it for routing, method matching, and middleware.
-- **LLM provider**: OpenAI (GPT-4o / o-series). Use official `github.com/openai/openai-go` SDK.
+- **LLM provider**: OpenRouter (OpenAI-compatible). Use official `github.com/openai/openai-go/v3` SDK with custom base URL.
 - **Stateless** — no database. Each request is a fresh analysis.
 - **Package layout**:
   - `handler/` — HTTP handlers (request parsing, JSON response writing)
   - `service/` — business logic (LLM prompt construction, response parsing)
   - `model/` — request/response structs
+  - `config/` — environment variable loading (.env via godotenv)
+  - `provider/` — LLM client abstraction (wraps OpenAI SDK for OpenRouter)
+  - `middleware/` — CORS, rate limit, body size limit
+  - `sanitizer/` — XSS/HTML/SQL injection detection
 
 ### API Contract
 - `POST /api/analyze` — accepts `{ "resume_text": string, "job_description": string }`
@@ -73,7 +77,7 @@ go fmt ./...          # Format
 ### Dev Setup
 - Frontend dev server: `http://localhost:5173` (default Vite)
 - Backend: pick a port (e.g., `:8080`) and configure frontend Vite proxy or CORS.
-- No `.env` files committed. Use environment variables for API keys (`OPENAI_API_KEY`).
+- No `.env` files committed. Use environment variables for API keys (`OPENROUTER_API_KEY`).
 
 ### What NOT to do
 - Don't add a database unless explicitly requested.

@@ -130,15 +130,15 @@ Triggered on successful `200 OK` from backend. Displays the response shape:
 
 ## 6. UI/UX Design Direction
 
-### Aesthetic: Vercel / Linear
+### Aesthetic: Neobrutalist
 
-- **Font**: `Inter` via Google Fonts CDN.
-- **Background**: Deep dark `#0a0a0a` (dark), clean white `#ffffff` (light).
-- **Surfaces**: Slightly elevated cards with `1px` borders (`#27272a` dark, `#e4e4e7` light) and subtle shadows.
-- **Typography**: `Inter` font family. Headings are tight (`letter-spacing: -0.02em`).
-- **Radii**: Small and sharp. `8px` for buttons, `12px` for cards. No excessive rounded corners.
-- **Spacing**: Generous. Sections separated by `80px–120px`. Inner padding `24px–32px`.
-- **Accent**: Purple (`#7c3aed` / `#8b5cf6`) for primary actions and score indicators.
+- **Fonts**: `Space Grotesk` for headlines, `Work Sans` for body. Self-hosted in `public/fonts/`.
+- **Background**: Light beige `#f9f9f9` (default), white `#ffffff` (cards).
+- **Surfaces**: White cards with `4px` solid black borders and hard offset shadows (`8px 8px 0 0 #000`).
+- **Typography**: `Space Grotesk` bold for headings (`letter-spacing: -0.02em`). `Work Sans` for body text. All headers uppercase.
+- **Radii**: `0px` — sharp corners everywhere (neobrutalist).
+- **Spacing**: Generous. Sections separated by `64px–96px`. Inner padding `32px`.
+- **Accent**: Yellow (`#FFDAB9` / `#FFE600`) for primary actions, pink (`#E0BBE4`) for secondary, cyan (`#B2E2D2`) for tertiary.
 
 ## 7. Frontend Architecture
 
@@ -149,147 +149,158 @@ Triggered on successful `200 OK` from backend. Displays the response shape:
 | Build Tool | Vite 8 | ✅ Existing |
 | Framework | React 19 + TypeScript | ✅ Existing |
 | Styling | Tailwind CSS v4 | ✅ Existing |
-| Routing | TanStack Router | ✅ Existing (unused for now) |
+| Routing | TanStack Router (active — `/` + `/analyze`) | ✅ Existing |
 | Compiler | babel-plugin-react-compiler | ✅ Existing |
-| PDF Parsing | `pdfjs-dist` | ⬜ Add |
-| DOCX Parsing | `mammoth` | ⬜ Add |
-| Icons | `lucide-react` | ⬜ Add |
-| Toasts | `sonner` | ⬜ Add |
+| PDF Parsing | `pdfjs-dist` | ✅ Existing |
+| DOCX Parsing | `mammoth` | ✅ Existing |
+| Icons | `lucide-react` | ✅ Existing |
+| Toasts | `sonner` | ✅ Existing |
 
 ### 7.2 State Management
 
 **No global state library. No `useReducer`.**
 
-All UI state lives in `App.tsx` using plain `useState`:
+Analyzer UI state lives in the route component `AnalyzePage` (`src/routes/analyze.tsx`) using plain `useState`:
 
 ```typescript
-function App() {
-  const [phase, setPhase] = useState<'idle' | 'ready' | 'analyzing' | 'results' | 'error'>('idle');
+function AnalyzePage() {
   const [resumeText, setResumeText] = useState('');
   const [jobDescription, setJobDescription] = useState('');
+  const [isExtracting, setIsExtracting] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [extractError, setExtractError] = useState('');
   const [results, setResults] = useState<AnalysisResponse | null>(null);
-  const [error, setError] = useState('');
   // ...
 }
 ```
 
-State is passed down as props. Callbacks (`setResumeText`, `setJobDescription`, `handleSubmit`) are passed to child components.
+State is passed down as props. Callbacks (`handleExtract`, `setJobDescription`, `handleSubmit`) are passed to child components.
 
-**The ONLY exception** is the `ThemeContext`. Since `Header` (toggle button) and the root `<html>` element both need theme awareness, a minimal context prevents prop drilling:
+**The ONLY exception** is the `ThemeContext`. The root layout uses a minimal context to avoid prop drilling:
 
 ```typescript
 // contexts/ThemeContext.tsx
-const ThemeContext = createContext({ theme: 'dark', toggle: () => {} });
+const ThemeContext = createContext<ThemeContextType>({ theme: 'light', toggle: () => {} });
 ```
 
 ### 7.3 Component Hierarchy
 
 ```
-App (holds all state)
-├── ThemeProvider
-├── Header
-│   └── ThemeToggle (consumes ThemeContext)
-├── HeroSection
-├── AnalyzerSection
-│   ├── FileDropzone (receives setResumeText)
-│   ├── JobDescriptionInput (receives jobDescription, setJobDescription)
-│   └── SubmitButton (receives onClick, disabled state)
-├── LoadingOverlay
-└── ResultsSection (receives results data)
-    ├── ScoreDisplay
-    ├── MissingKeywordsList
-    ├── SectionFeedbackCards
-    └── RewriteSuggestionsList
+Router
+└── RootLayout (ThemeProvider → Outlet)
+    ├── LandingPage (/)
+    │   ├── Header
+    │   ├── HeroSection
+    │   ├── Features
+    │   ├── TheProcess
+    │   ├── SuccessStories
+    │   ├── Questions
+    │   └── Footer
+    └── AnalyzePage (/analyze)
+        ├── AnalyzerNavbar
+        ├── FileDropzone
+        ├── JobDescriptionInput
+        ├── SubmitButton
+        ├── LoadingOverlay
+        └── ResultsSection
+            ├── ScoreDisplay
+            ├── MissingKeywordsList
+            ├── SectionFeedbackCards
+            └── RewriteSuggestionsList
 ```
 
 ### 7.4 File Structure
 
 ```
 src/
-├── main.tsx
-├── App.tsx
-├── index.css                  # Tailwind import + CSS custom properties for theming
+├── main.tsx                   # Entry point: TanStack Router setup + render
+├── index.css                  # Tailwind import + @theme block + neobrutal utility classes
 ├── lib/
-│   ├── extract-text.ts        # PDF/DOCX extraction logic
-│   └── api.ts                 # Fetch wrapper for /api/analyze
+│   ├── extract-text.ts        # Client-side PDF/DOCX extraction (lazy-loaded)
+│   └── api.ts                 # Fetch wrapper for /api/analyze (with mock mode)
 ├── types/
-│   └── index.ts               # AnalysisRequest, AnalysisResponse
+│   └── index.ts               # AnalysisRequest, AnalysisResponse interfaces
 ├── contexts/
-│   └── ThemeContext.tsx       # Theme provider + hook
-├── components/
-│   ├── Header.tsx
-│   ├── ThemeToggle.tsx
-│   ├── HeroSection.tsx
-│   ├── AnalyzerSection.tsx
-│   ├── FileDropzone.tsx
-│   ├── JobDescriptionInput.tsx
-│   ├── LoadingOverlay.tsx
-│   ├── ResultsSection.tsx
-│   ├── ScoreDisplay.tsx
-│   ├── MissingKeywordsList.tsx
-│   ├── SectionFeedbackCards.tsx
-│   └── RewriteSuggestionsList.tsx
-└── hooks/
-    └── useTheme.ts            # Convenience hook for ThemeContext
+│   └── ThemeContext.tsx        # Theme provider (light default, toggle function)
+├── hooks/
+│   └── useTheme.ts            # Convenience hook for ThemeContext
+├── routes/
+│   ├── __root.tsx             # Root layout: ThemeProvider + Outlet
+│   ├── index.tsx              # Landing page (/)
+│   └── analyze.tsx            # Analyzer page (/analyze) — all UI state lives here
+└── components/
+    ├── Header.tsx             # Landing page header (sticky nav)
+    ├── HeroSection.tsx        # Hero with CTA → /analyze
+    ├── Features.tsx           # Feature cards grid
+    ├── TheProcess.tsx         # 3-step process timeline
+    ├── SuccessStories.tsx     # Testimonial cards
+    ├── Questions.tsx          # FAQ accordion
+    ├── Footer.tsx             # Site footer
+    └── analyzer/              # Analyzer-specific components (route: /analyze)
+        ├── AnalyzerNavbar.tsx
+        ├── FileDropzone.tsx
+        ├── JobDescriptionInput.tsx
+        ├── SubmitButton.tsx
+        ├── LoadingOverlay.tsx
+        ├── ResultsSection.tsx
+        ├── ScoreDisplay.tsx
+        ├── MissingKeywordsList.tsx
+        ├── SectionFeedbackCards.tsx
+        └── RewriteSuggestionsList.tsx
 ```
 
 ### 7.5 Data Flow
 
-1. User drops file → `FileDropzone` calls `extractText(file)` → calls `setResumeText()` passed from `App`.
-2. User types job description → `JobDescriptionInput` calls `setJobDescription()` passed from `App`.
-3. User clicks submit → `App` calls `analyzeResume(resumeText, jobDescription)` from `lib/api.ts`.
-4. On success: `App` calls `setResults(data)` and `setPhase('results')`.
-5. `App` conditionally renders `ResultsSection`.
+1. User navigates to `/analyze` → TanStack Router renders `AnalyzePage`.
+2. User drops file → `FileDropzone` calls `extractText(file)` → calls `handleExtract()` in `AnalyzePage` → `setResumeText()`.
+3. User types job description → `JobDescriptionInput` calls `onChange` → `setJobDescription()`.
+4. User clicks submit → `handleSubmit()` calls `analyzeResume(resumeText, jobDescription)` from `lib/api.ts`.
+5. On success: `AnalyzePage` calls `setResults(data)` and renders `ResultsSection`.
+6. On error: `sonner` toast displays error message.
+7. "Analyze Another Resume" clears all state via `handleReset()`.
 
 ### 7.6 Theme Implementation Detail
 
-Tailwind v4 is CSS-first. We will **not** use Tailwind's dark mode classes. Instead:
+Tailwind v4 is CSS-first. The theme uses a `@theme` block in `index.css` to define design tokens. No Tailwind `dark:` mode classes are used.
 
 ```css
 /* index.css */
 @import "tailwindcss";
 
-:root {
-  --bg: #0a0a0a;
-  --bg-elevated: #16171d;
-  --text: #9ca3af;
-  --text-heading: #f3f4f6;
-  --border: #27272a;
-  --accent: #7c3aed;
-  --accent-text: #ffffff;
-  --success: #22c55e;
-  --warning: #f59e0b;
-  --error: #ef4444;
-}
-
-:root.light {
-  --bg: #ffffff;
-  --bg-elevated: #f4f4f5;
-  --text: #52525b;
-  --text-heading: #18181b;
-  --border: #e4e4e7;
-  --accent: #7c3aed;
-  --accent-text: #ffffff;
-  --success: #16a34a;
-  --warning: #d97706;
-  --error: #dc2626;
+@theme {
+  --color-primary: #ffdab9;
+  --color-primary-container: #ffdab9;
+  --color-secondary: #e0bbe4;
+  --color-secondary-container: #e0bbe4;
+  --color-tertiary: #b2e2d2;
+  --color-surface: #f9f9f9;
+  --color-background: #f9f9f9;
+  --color-on-surface: #1b1b1b;
+  --color-on-surface-variant: #4b4731;
+  --color-on-primary: #1b1b1b;
+  --color-border-brutal: #000000;
+  --color-card: #ffffff;
+  --color-text: #1b1b1b;
+  --color-text-muted: #4b4731;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
 }
 ```
 
-Components reference these variables directly or use Tailwind utilities mapped via `@theme` if needed.
+Components use theme tokens via Tailwind utilities (e.g., `bg-primary-container`, `text-on-surface-variant`) and neobrutal utility classes (`btn-neo`, `card-neo`, `tag-neo`) defined in `@layer components`.
 
 ### 7.7 PDF.js Worker Setup
 
 After installing `pdfjs-dist`, copy the worker file to the public directory so the browser can load it at a stable URL:
 
 ```bash
-cp node_modules/pdfjs-dist/build/pdf.worker.min.js public/pdf.worker.min.js
+cp node_modules/pdfjs-dist/build/pdf.worker.min.mjs public/pdf.worker.min.js
 ```
 
-In code:
+In code (`src/lib/extract-text.ts`):
 
 ```typescript
-import * as pdfjsLib from 'pdfjs-dist';
 pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
 ```
 

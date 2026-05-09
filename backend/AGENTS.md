@@ -26,7 +26,7 @@ A stateless Go HTTP service that receives a resume and job description, uses an 
 | Language | Go 1.25.0 |
 | Module | `resu-me` |
 | Router | `github.com/gorilla/mux` |
-| LLM SDK | `github.com/openai/openai-go` (OpenRouter-compatible) |
+| LLM SDK | `github.com/openai/openai-go/v3` (OpenRouter-compatible) |
 | Rate Limiter | In-memory hash map with token bucket |
 | Logging | Standard library `log` |
 | Input Sanitizer | Custom (regex-based HTML/SQL pattern detection) |
@@ -41,6 +41,12 @@ backend/
 ├── go.mod
 ├── main.go                 # Entry point: server setup, router, middleware
 ├── AGENTS.md               # This file
+├── config/
+│   ├── config.go           # Environment variable loading (.env via godotenv)
+│   └── config_test.go      # Config loading tests (defaults, custom, errors)
+├── provider/
+│   ├── openai.go           # LLM client abstraction (wraps OpenAI SDK for OpenRouter)
+│   └── openai_test.go      # Provider tests (client creation, HTTP errors)
 ├── model/
 │   ├── request.go          # AnalysisRequest, AnalysisResponse, ErrorResponse structs
 │   └── request_test.go     # JSON marshaling, validation tests
@@ -50,9 +56,11 @@ backend/
 ├── service/
 │   ├── analyze.go          # Business logic: prompt construction, LLM call, response parsing
 │   ├── analyze_test.go     # Prompt construction, response parsing tests (mock LLM)
-│   ├── ratelimit.go        # Token bucket rate limiter (per-IP, in-memory)
+│   ├── ratelimit.go        # Token bucket rate limiter (per-IP, in-memory, golang.org/x/time/rate)
 │   └── ratelimit_test.go   # Token bucket: acquire, refill, burst, concurrency, cleanup
 ├── middleware/
+│   ├── bodylimit.go        # Request body size limit middleware (100KB)
+│   ├── bodylimit_test.go   # Body limit: within limit, over limit
 │   ├── cors.go             # CORS middleware (Allow *)
 │   ├── cors_test.go        # CORS header + preflight tests
 │   ├── ratelimit.go        # Rate limit middleware (wraps service/ratelimit.go)
@@ -66,6 +74,7 @@ backend/
 
 ```
 POST /api/analyze
+  → Body limit middleware (100KB max)
   → CORS middleware (preflight + headers)
   → Rate limit middleware (per-IP token bucket)
   → Analyze handler
@@ -74,7 +83,7 @@ POST /api/analyze
     → Sanitize input (strip HTML/scripts, reject SQL injection)
     → service.Analyze(resumeText, jobDesc)
       → Build system + user prompt
-      → Call OpenRouter API (JSON mode, low temp)
+      → provider.OpenAIClient.Chat() (OpenRouter via OpenAI SDK)
       → Parse LLM response into model.AnalysisResponse
     → Write JSON response (200 OK)
 ```
@@ -215,7 +224,7 @@ POST /api/analyze
 
 ### 9.2 SDK Usage
 
-Use `github.com/openai/openai-go` with a custom `WithBaseURL` option pointing to the OpenRouter endpoint. The OpenAI-compatible API means the same SDK works without modification.
+Use `github.com/openai/openai-go/v3` with a custom `WithBaseURL` option pointing to the OpenRouter endpoint. The OpenAI-compatible API means the same SDK works without modification. The SDK is wrapped in the `provider/` package (`provider.OpenAIClient`) which exposes a `Chat(ctx, prompt)` method and is injected into the service layer via the `LLMClient` interface.
 
 ### 9.3 System Prompt
 
@@ -263,6 +272,13 @@ Prompt should instruct:
 | `OPENROUTER_API_KEY` | Yes | — | OpenRouter API key |
 | `OPENROUTER_BASE_URL` | No | `https://openrouter.ai/api/v1` | OpenRouter API base URL |
 | `OPENROUTER_MODEL` | No | `openai/gpt-oss-120b` | LLM model to use |
+| `LLM_TIMEOUT` | No | `60s` | LLM call timeout (must be less than `SERVER_WRITE_TIMEOUT`) |
+| `SERVER_READ_TIMEOUT` | No | `30s` | HTTP server read timeout |
+| `SERVER_WRITE_TIMEOUT` | No | `60s` | HTTP server write timeout |
+| `SERVER_IDLE_TIMEOUT` | No | `120s` | HTTP server idle timeout |
+| `RATE_LIMIT_RATE` | No | `10` | Requests per second per IP |
+| `RATE_LIMIT_BURST` | No | `3` | Burst capacity per IP |
+| `RATE_LIMIT_TTL` | No | `10m` | Rate limiter stale entry TTL |
 
 ## 12. Commands
 
@@ -317,6 +333,18 @@ go fmt ./...          # Format code
 - Mixed case: `<ScRiPt>` → rejected
 - Legitimate text with angle brackets: "C++ > Java, 3 < 5" → passes
 
+#### `config/config_test.go`
+- Load with defaults: all config values match expected defaults
+- Load with custom env: all config values match custom env vars
+- Missing API key: returns error containing "OPENROUTER_API_KEY"
+- Invalid duration: returns error for malformed TTL
+- Invalid int: returns error for malformed burst value
+- Invalid float: returns error for malformed rate value
+
+#### `provider/openai_test.go`
+- NewOpenAIClient: client created with correct model string
+- Chat with HTTP error: returns error on non-2xx response
+
 #### `service/ratelimit_test.go`
 - Token bucket: initial state allows burst
 - Token bucket: exhausts tokens, then refills over time
@@ -357,5 +385,4 @@ go fmt ./...          # Format code
 - Add metrics (request count, latency, error rate) via Prometheus.
 - Support multiple LLM providers via interface abstraction.
 - Add analysis caching for identical inputs.
-- Add request body size limit middleware.
 - Switch to production-grade LLM (GPT-4o, Claude) when moving beyond dev.
