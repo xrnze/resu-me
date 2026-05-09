@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -17,10 +18,12 @@ type Config struct {
 }
 
 type ServerConfig struct {
-	Port         string
-	ReadTimeout  time.Duration
-	WriteTimeout time.Duration
-	IdleTimeout  time.Duration
+	Port           string
+	CORSOrigin     string
+	TrustedProxies []string
+	ReadTimeout    time.Duration
+	WriteTimeout   time.Duration
+	IdleTimeout    time.Duration
 }
 
 type LLMConfig struct {
@@ -66,6 +69,16 @@ func Load() (*Config, error) {
 		return nil, fmt.Errorf("invalid LLM_TIMEOUT: %w", err)
 	}
 
+	corsOrigin := getEnv("CORS_ORIGIN", "*")
+
+	trustedProxiesStr := os.Getenv("TRUSTED_PROXIES")
+	var trustedProxies []string
+	if trustedProxiesStr != "" {
+		for _, p := range strings.Split(trustedProxiesStr, ",") {
+			trustedProxies = append(trustedProxies, strings.TrimSpace(p))
+		}
+	}
+
 	readTimeout, err := parseDurationEnv("SERVER_READ_TIMEOUT", 30*time.Second)
 	if err != nil {
 		return nil, fmt.Errorf("invalid SERVER_READ_TIMEOUT: %w", err)
@@ -83,10 +96,12 @@ func Load() (*Config, error) {
 
 	return &Config{
 		Server: ServerConfig{
-			Port:         getEnv("PORT", "8080"),
-			ReadTimeout:  readTimeout,
-			WriteTimeout: writeTimeout,
-			IdleTimeout:  idleTimeout,
+			Port:           getEnv("PORT", "8080"),
+			CORSOrigin:     corsOrigin,
+			TrustedProxies: trustedProxies,
+			ReadTimeout:    readTimeout,
+			WriteTimeout:   writeTimeout,
+			IdleTimeout:    idleTimeout,
 		},
 		LLM: LLMConfig{
 			APIKey:  apiKey,

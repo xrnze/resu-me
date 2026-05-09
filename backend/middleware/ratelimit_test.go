@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -11,7 +12,7 @@ import (
 
 func TestRateLimit_Allowed(t *testing.T) {
 	rl := service.NewRateLimiter(100, 3, 0)
-	handler := RateLimit(rl)(testHandler())
+	handler := RateLimit(rl, nil)(testHandler())
 
 	req := httptest.NewRequest("GET", "/", nil)
 	req.RemoteAddr = "10.0.0.1:12345"
@@ -23,7 +24,7 @@ func TestRateLimit_Allowed(t *testing.T) {
 
 func TestRateLimit_Blocked(t *testing.T) {
 	rl := service.NewRateLimiter(100, 1, 0)
-	handler := RateLimit(rl)(testHandler())
+	handler := RateLimit(rl, nil)(testHandler())
 
 	req := httptest.NewRequest("GET", "/", nil)
 	req.RemoteAddr = "10.0.0.2:12345"
@@ -39,7 +40,7 @@ func TestRateLimit_Blocked(t *testing.T) {
 
 func TestRateLimit_RetryAfterHeader(t *testing.T) {
 	rl := service.NewRateLimiter(100, 1, 0)
-	handler := RateLimit(rl)(testHandler())
+	handler := RateLimit(rl, nil)(testHandler())
 
 	req := httptest.NewRequest("GET", "/", nil)
 	req.RemoteAddr = "10.0.0.3:12345"
@@ -55,7 +56,7 @@ func TestRateLimit_RetryAfterHeader(t *testing.T) {
 
 func TestRateLimit_DifferentIPs(t *testing.T) {
 	rl := service.NewRateLimiter(100, 1, 0)
-	handler := RateLimit(rl)(testHandler())
+	handler := RateLimit(rl, nil)(testHandler())
 
 	req1 := httptest.NewRequest("GET", "/", nil)
 	req1.RemoteAddr = "10.0.0.4:12345"
@@ -70,9 +71,24 @@ func TestRateLimit_DifferentIPs(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w2.Code, "different IP got status %d, want 200", w2.Code)
 }
 
-func TestRateLimit_ForwardedFor(t *testing.T) {
+func TestRateLimit_ForwardedForIgnoredWithoutTrust(t *testing.T) {
 	rl := service.NewRateLimiter(100, 1, 0)
-	handler := RateLimit(rl)(testHandler())
+	handler := RateLimit(rl, nil)(testHandler())
+
+	req := httptest.NewRequest("GET", "/", nil)
+	req.Header.Set("X-Forwarded-For", "203.0.113.1")
+	req.RemoteAddr = "10.0.0.1:12345"
+
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+}
+
+func TestRateLimit_ForwardedForTrustedProxy(t *testing.T) {
+	_, trustedNet, _ := net.ParseCIDR("10.0.0.0/8")
+	rl := service.NewRateLimiter(100, 1, 0)
+	handler := RateLimit(rl, []*net.IPNet{trustedNet})(testHandler())
 
 	req := httptest.NewRequest("GET", "/", nil)
 	req.Header.Set("X-Forwarded-For", "203.0.113.1")

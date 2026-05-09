@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -32,10 +33,17 @@ func main() {
 	rl := service.NewRateLimiter(cfg.RateLimit.Rate, cfg.RateLimit.Burst, cfg.RateLimit.TTL)
 	defer rl.Stop()
 
+	var trustedNetworks []*net.IPNet
+	for _, cidr := range cfg.Server.TrustedProxies {
+		if _, p, err := net.ParseCIDR(cidr); err == nil {
+			trustedNetworks = append(trustedNetworks, p)
+		}
+	}
+
 	r := mux.NewRouter()
 	r.Use(middleware.BodyLimit(100 * 1024))
-	r.Use(middleware.CORS)
-	r.Use(middleware.RateLimit(rl))
+	r.Use(middleware.CORS(cfg.Server.CORSOrigin))
+	r.Use(middleware.RateLimit(rl, trustedNetworks))
 
 	r.Handle("/api/analyze", analyzeHandler)
 	r.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {

@@ -16,7 +16,7 @@ func testHandler() http.Handler {
 }
 
 func TestCORS_HeadersOnPOST(t *testing.T) {
-	handler := CORS(testHandler())
+	handler := CORS("*")(testHandler())
 	req := httptest.NewRequest("POST", "/api/analyze", nil)
 	w := httptest.NewRecorder()
 	handler.ServeHTTP(w, req)
@@ -28,7 +28,7 @@ func TestCORS_HeadersOnPOST(t *testing.T) {
 }
 
 func TestCORS_Preflight(t *testing.T) {
-	handler := CORS(testHandler())
+	handler := CORS("*")(testHandler())
 	req := httptest.NewRequest("OPTIONS", "/api/analyze", nil)
 	w := httptest.NewRecorder()
 	handler.ServeHTTP(w, req)
@@ -41,7 +41,7 @@ func TestCORS_Preflight(t *testing.T) {
 }
 
 func TestCORS_MethodsHeader(t *testing.T) {
-	handler := CORS(testHandler())
+	handler := CORS("*")(testHandler())
 	req := httptest.NewRequest("OPTIONS", "/api/analyze", nil)
 	w := httptest.NewRecorder()
 	handler.ServeHTTP(w, req)
@@ -52,7 +52,7 @@ func TestCORS_MethodsHeader(t *testing.T) {
 }
 
 func TestCORS_HeadersHeader(t *testing.T) {
-	handler := CORS(testHandler())
+	handler := CORS("*")(testHandler())
 	req := httptest.NewRequest("OPTIONS", "/api/analyze", nil)
 	w := httptest.NewRecorder()
 	handler.ServeHTTP(w, req)
@@ -60,4 +60,14 @@ func TestCORS_HeadersHeader(t *testing.T) {
 	resp := w.Result()
 	headers := resp.Header.Get("Access-Control-Allow-Headers")
 	assert.Equal(t, "Content-Type", headers)
+}
+
+func TestCORS_CustomOrigin(t *testing.T) {
+	handler := CORS("https://example.com")(testHandler())
+	req := httptest.NewRequest("POST", "/api/analyze", nil)
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+
+	resp := w.Result()
+	assert.Equal(t, "https://example.com", resp.Header.Get("Access-Control-Allow-Origin"))
 }

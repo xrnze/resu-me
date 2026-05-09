@@ -1,8 +1,23 @@
 entryPoints:
   web:
     address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+  websecure:
+    address: ":443"
 
 providers:
   docker:
     exposedByDefault: false
     network: resu-me
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      storage: /etc/traefik/acme.json
+      httpChallenge:
+        entryPoint: web
