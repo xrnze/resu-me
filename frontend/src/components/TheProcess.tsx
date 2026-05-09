@@ -1,11 +1,7 @@
 export function TheProcess() {
   return (
     <section id="process" className="px-8 md:px-16 py-xl border-y-4 border-black bg-white overflow-hidden">
-      <div className="mb-lg">
-        <h2 className="font-headline-lg text-headline-lg uppercase text-black inline-block border-b-8 border-primary-container">
-          The Process
-        </h2>
-      </div>
+      <h2 className="font-headline-lg text-headline-lg uppercase text-black mb-lg">The Process</h2>
       <div className="relative">
         <div className="hidden md:block absolute top-1/2 left-0 w-full h-1 bg-black -translate-y-1/2 -z-10"></div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-xl">
@@ -16,7 +12,7 @@ export function TheProcess() {
             </div>
             <h4 className="font-headline-md text-headline-md uppercase text-black">Upload</h4>
             <p className="font-body-md text-black">
-              Drag your dusty PDF or Word doc into the engine. We handle the rest.
+              Drag in your resume, paste the job description. Takes about ten seconds.
             </p>
           </div>
 
@@ -27,7 +23,7 @@ export function TheProcess() {
             </div>
             <h4 className="font-headline-md text-headline-md uppercase text-black">Analyze</h4>
             <p className="font-body-md text-black">
-              Our AI shreds your content and identifies every missed opportunity.
+              We compare your resume to the job posting and surface every missing keyword, weak bullet, and vague section.
             </p>
           </div>
 
@@ -38,7 +34,7 @@ export function TheProcess() {
             </div>
             <h4 className="font-headline-md text-headline-md uppercase text-black">Conquer</h4>
             <p className="font-body-md text-black">
-              Download your high-powered resume and go claim your new salary.
+              Read the feedback, grab the rewrites, fix your resume. Then go get that job.
             </p>
           </div>
         </div>

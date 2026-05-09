@@ -1,17 +1,20 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 const questions = [
   {
-    question: 'Is my data secure?',
-    answer: 'Your resume and job description are sent securely to our analysis engine and never stored on our servers. We don\'t keep copies of your data after the analysis completes.',
+    question: "Is my data secure?",
+    answer:
+      "Your resume and job description are sent securely to our analysis engine and never stored on our servers. We don't keep copies of your data after the analysis completes.",
   },
   {
-    question: 'Does it work for tech jobs?',
-    answer: 'Yes. We specialize in tech, finance, and marketing sectors where ATS systems are most aggressive.',
+    question: "Does it work for tech jobs?",
+    answer:
+      "Yes. We specialize in tech, finance, and marketing sectors where ATS systems are most aggressive.",
   },
   {
-    question: 'Can I use it more than once?',
-    answer: 'Absolutely. There\'s no limit — analyze as many resumes and job descriptions as you need, completely free.',
+    question: "Can I use it more than once?",
+    answer:
+      "Absolutely. There's no limit, analyze as many resumes and job descriptions as you need, completely free.",
   },
 ];
 
@@ -23,8 +26,13 @@ export function Questions() {
   };
 
   return (
-    <section id="faq" className="px-8 md:px-16 py-xl bg-surface border-t-4 border-black">
-      <h2 className="font-headline-lg text-headline-lg uppercase text-black mb-lg">Questions?</h2>
+    <section
+      id="faq"
+      className="px-8 md:px-16 py-xl bg-surface border-t-4 border-black"
+    >
+      <h2 className="font-headline-lg text-headline-lg uppercase text-black mb-lg">
+        Questions?
+      </h2>
       <div className="max-w-4xl space-y-sm">
         {questions.map((q, index) => {
           const isOpen = openIndex === index;
@@ -32,7 +40,7 @@ export function Questions() {
             <div
               key={index}
               className={`border-4 border-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${
-                isOpen ? 'bg-primary-container' : 'bg-white'
+                isOpen ? "bg-primary-container" : "bg-white"
               }`}
             >
               <div
@@ -43,7 +51,7 @@ export function Questions() {
                   {q.question}
                 </h4>
                 <span className="material-symbols-outlined text-4xl text-black">
-                  {isOpen ? 'remove' : 'add'}
+                  {isOpen ? "remove" : "add"}
                 </span>
               </div>
               {isOpen && q.answer && (
