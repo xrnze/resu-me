@@ -27,10 +27,12 @@ type ServerConfig struct {
 }
 
 type LLMConfig struct {
-	APIKey  string
-	BaseURL string
-	Model   string
-	Timeout time.Duration
+	APIKey        string
+	BaseURL       string
+	Model         string
+	Timeout       time.Duration
+	FilterModel   string
+	FilterTimeout time.Duration
 }
 
 type RateLimitConfig struct {
@@ -69,6 +71,11 @@ func Load() (*Config, error) {
 		return nil, fmt.Errorf("invalid LLM_TIMEOUT: %w", err)
 	}
 
+	filterTimeout, err := parseDurationEnv("FILTER_TIMEOUT", 10*time.Second)
+	if err != nil {
+		return nil, fmt.Errorf("invalid FILTER_TIMEOUT: %w", err)
+	}
+
 	corsOrigin := getEnv("CORS_ORIGIN", "*")
 
 	trustedProxiesStr := os.Getenv("TRUSTED_PROXIES")
@@ -104,10 +111,12 @@ func Load() (*Config, error) {
 			IdleTimeout:    idleTimeout,
 		},
 		LLM: LLMConfig{
-			APIKey:  apiKey,
-			BaseURL: getEnv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"),
-			Model:   getEnv("OPENROUTER_MODEL", "openai/gpt-oss-120b"),
-			Timeout: llmTimeout,
+			APIKey:        apiKey,
+			BaseURL:       getEnv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"),
+			Model:         getEnv("OPENROUTER_MODEL", "openai/gpt-oss-120b"),
+			Timeout:       llmTimeout,
+			FilterModel:   getEnv("FILTER_MODEL", "meta-llama/llama-3.1-8b-instruct"),
+			FilterTimeout: filterTimeout,
 		},
 		RateLimit: RateLimitConfig{
 			Rate:  rateLimitRate,

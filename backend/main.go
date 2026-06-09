@@ -26,9 +26,15 @@ func main() {
 		log.Fatal(err)
 	}
 
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
 	llmClient := provider.NewOpenAIClient(cfg.LLM.APIKey, cfg.LLM.BaseURL, cfg.LLM.Model)
 	analyzeSvc := service.NewAnalyzeService(llmClient, cfg.LLM.Timeout)
-	analyzeHandler := handler.NewAnalyzeHandler(analyzeSvc)
+
+	filterClient := provider.NewOpenAIClient(cfg.LLM.APIKey, cfg.LLM.BaseURL, cfg.LLM.FilterModel)
+	filterSvc := service.NewFilterService(filterClient, cfg.LLM.FilterTimeout)
+
+	analyzeHandler := handler.NewAnalyzeHandler(analyzeSvc, filterSvc)
 
 	rl := service.NewRateLimiter(cfg.RateLimit.Rate, cfg.RateLimit.Burst, cfg.RateLimit.TTL)
 	defer rl.Stop()

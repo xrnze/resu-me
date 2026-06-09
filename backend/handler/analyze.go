@@ -8,18 +8,24 @@ import (
 	"net/http"
 	"resu-me/model"
 	"resu-me/sanitizer"
+	"resu-me/service"
 )
 
 type Analyzer interface {
 	Analyze(ctx context.Context, resumeText, jobDescription string) (*model.AnalysisResponse, error)
 }
 
-type AnalyzeHandler struct {
-	analyzer Analyzer
+type Injector interface {
+	Check(ctx context.Context, resumeText, jobDesc string) error
 }
 
-func NewAnalyzeHandler(analyzer Analyzer) *AnalyzeHandler {
-	return &AnalyzeHandler{analyzer: analyzer}
+type AnalyzeHandler struct {
+	analyzer Analyzer
+	injector Injector
+}
+
+func NewAnalyzeHandler(analyzer Analyzer, injector Injector) *AnalyzeHandler {
+	return &AnalyzeHandler{analyzer: analyzer, injector: injector}
 }
 
 func (h *AnalyzeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -45,19 +51,30 @@ func (h *AnalyzeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := sanitizer.Sanitize(req.ResumeText); err != nil {
-		log.Printf("sanitization rejection on resume_text: %v", err)
+		log.Printf("%v", err)
 		writeError(w, http.StatusUnprocessableEntity, "VALIDATION_ERROR", "resume_text contains disallowed patterns")
 		return
 	}
 	if err := sanitizer.Sanitize(req.JobDescription); err != nil {
-		log.Printf("sanitization rejection on job_description: %v", err)
+		log.Printf("%v", err)
 		writeError(w, http.StatusUnprocessableEntity, "VALIDATION_ERROR", "job_description contains disallowed patterns")
+		return
+	}
+
+	if err := h.injector.Check(r.Context(), req.ResumeText, req.JobDescription); err != nil {
+		if errors.Is(err, service.ErrInjectionDetected) {
+			log.Printf("%v", err)
+			writeError(w, http.StatusUnprocessableEntity, "PROMPT_INJECTION_DETECTED", err.Error())
+			return
+		}
+		log.Printf("%v", err)
+		writeError(w, http.StatusInternalServerError, "INTERNAL_ERROR", "Input validation failed. Please try again.")
 		return
 	}
 
 	resp, err := h.analyzer.Analyze(r.Context(), req.ResumeText, req.JobDescription)
 	if err != nil {
-		log.Printf("analysis error: %v", err)
+		log.Printf("%v", err)
 		writeError(w, http.StatusBadGateway, "LLM_ERROR", "Failed to communicate with the analysis provider.")
 		return
 	}

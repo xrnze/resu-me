@@ -56,6 +56,8 @@ backend/
 ├── service/
 │   ├── analyze.go          # Business logic: prompt construction, LLM call, response parsing
 │   ├── analyze_test.go     # Prompt construction, response parsing tests (mock LLM)
+│   ├── filter.go           # LLM-based prompt injection filter
+│   ├── filter_test.go      # Filter tests: safe, injection, invalid JSON, network error
 │   ├── ratelimit.go        # Token bucket rate limiter (per-IP, in-memory, golang.org/x/time/rate)
 │   └── ratelimit_test.go   # Token bucket: acquire, refill, burst, concurrency, cleanup
 ├── middleware/
@@ -81,6 +83,8 @@ POST /api/analyze
     → Parse JSON body → model.AnalysisRequest
     → Validate (non-empty, max length)
     → Sanitize input (strip HTML/scripts, reject SQL injection)
+    → Check prompt injection via LLM filter (separate fast model)
+      → On injection detected: return 422 PROMPT_INJECTION_DETECTED
     → service.Analyze(resumeText, jobDesc)
       → Build system + user prompt
       → provider.OpenAIClient.Chat() (OpenRouter via OpenAI SDK)
@@ -203,6 +207,22 @@ POST /api/analyze
 
 **Implementation**: Use compiled regex patterns in `sanitizer/input.go`. Check both fields before passing to the LLM service. Log rejected patterns for debugging (do not log full input).
 
+### 7.3 Prompt Injection Filter
+
+After regex sanitization passes, an LLM-based prompt injection filter runs against both fields in a single call:
+
+| Field | Behavior |
+|-------|----------|
+| Filter passes (`safe: true`) | Request proceeds to analysis |
+| Injection detected (`safe: false`) | Return 422 `PROMPT_INJECTION_DETECTED` |
+| Filter system error (timeout, network) | Return 500 `INTERNAL_ERROR` |
+
+**Filter model**: A separate fast/cheap model configured via `FILTER_MODEL` (default: `meta-llama/llama-3.1-8b-instruct`). Uses a separate LLM client instance from the analysis model.
+
+**Filter prompt**: Wraps both inputs in `<RESUME_TEXT>` and `<JOB_DESCRIPTION>` XML-style markers. Instructs the model to reply with `{"safe": true/false, "reason": "<brief explanation>"}`.
+
+**Implementation**: `service/filter.go` — `FilterService.Check(ctx, resumeText, jobDesc)` → calls the LLM → parses JSON verdict → returns `ErrInjectionDetected` if unsafe. Wired via `handler.Injector` interface in the handler.
+
 ## 8. Rate Limiting
 
 - **Strategy**: Token bucket per client IP, stored in a concurrent-safe `map[string]*TokenBucket`.
@@ -273,6 +293,8 @@ Prompt should instruct:
 | `OPENROUTER_BASE_URL` | No | `https://openrouter.ai/api/v1` | OpenRouter API base URL |
 | `OPENROUTER_MODEL` | No | `openai/gpt-oss-120b` | LLM model to use |
 | `LLM_TIMEOUT` | No | `60s` | LLM call timeout (must be less than `SERVER_WRITE_TIMEOUT`) |
+| `FILTER_MODEL` | No | `meta-llama/llama-3.1-8b-instruct` | Fast model for prompt injection detection |
+| `FILTER_TIMEOUT` | No | `10s` | Filter LLM call timeout |
 | `SERVER_READ_TIMEOUT` | No | `30s` | HTTP server read timeout |
 | `SERVER_WRITE_TIMEOUT` | No | `60s` | HTTP server write timeout |
 | `SERVER_IDLE_TIMEOUT` | No | `120s` | HTTP server idle timeout |
@@ -296,9 +318,10 @@ go fmt ./...          # Format code
 |------|-------------|---------|
 | `BAD_REQUEST` | 400 | Malformed request body |
 | `VALIDATION_ERROR` | 422 | Input validation or sanitization failed |
+| `PROMPT_INJECTION_DETECTED` | 422 | LLM filter flagged prompt injection |
 | `RATE_LIMITED` | 429 | Too many requests |
-| `LLM_ERROR` | 502 | OpenRouter API call failed |
 | `INTERNAL_ERROR` | 500 | Unexpected server error |
+| `LLM_ERROR` | 502 | OpenRouter API call failed |
 
 ## 14. TDD Workflow
 
@@ -360,6 +383,15 @@ go fmt ./...          # Format code
 - Response parsing: missing fields → error
 - Response parsing: score out of range → error
 
+#### `service/filter_test.go`
+- Filter returns `safe: true` → passes through
+- Filter returns `safe: false` → error wrapping `ErrInjectionDetected`
+- Filter returns invalid JSON → error
+- Filter returns missing `safe` field → error
+- LLM client network error → error
+- LLM client context timeout → error
+- `buildFilterPrompt` contains both inputs and XML-style delimiters
+
 #### `handler/analyze_test.go`
 - Valid request → 200 + correct response body
 - Missing `resume_text` → 422 `VALIDATION_ERROR`
@@ -368,6 +400,8 @@ go fmt ./...          # Format code
 - Malformed JSON → 400 `BAD_REQUEST`
 - XSS in input → 422 `VALIDATION_ERROR`
 - SQL injection in input → 422 `VALIDATION_ERROR`
+- Prompt injection detected → 422 `PROMPT_INJECTION_DETECTED`
+- Filter system error → 500 `INTERNAL_ERROR`
 - Service error → 502 `LLM_ERROR`
 
 #### `middleware/cors_test.go`
