@@ -235,16 +235,16 @@ After regex sanitization passes, an LLM-based prompt injection filter runs again
 
 ### 9.1 Provider Configuration
 
-- **Provider**: OpenRouter (OpenAI-compatible API).
-- **Base URL**: Configurable via `OPENROUTER_BASE_URL` env var. Default: `https://openrouter.ai/api/v1`.
-- **API Key**: Required via `OPENROUTER_API_KEY` env var. Fail fast on startup if missing.
-- **Model**: Configurable via `OPENROUTER_MODEL` env var. Default: `openai/gpt-oss-120b`.
+- **Provider**: Any OpenAI-compatible API. Default: OpenRouter.
+- **Base URL**: Configurable via `LLM_BASE_URL` env var. Default: `https://openrouter.ai/api/v1`.
+- **API Key**: Required via `LLM_API_KEY` env var. Fail fast on startup if missing.
+- **Model**: Configurable via `LLM_MODEL` env var. Default: `openai/gpt-oss-120b`.
 - **Temperature**: 0.1–0.3 for deterministic output.
 - **Response format**: JSON mode / structured output.
 
 ### 9.2 SDK Usage
 
-Use `github.com/openai/openai-go/v3` with a custom `WithBaseURL` option pointing to the OpenRouter endpoint. The OpenAI-compatible API means the same SDK works without modification. The SDK is wrapped in the `provider/` package (`provider.OpenAIClient`) which exposes a `Chat(ctx, prompt)` method and is injected into the service layer via the `LLMClient` interface.
+Use `github.com/openai/openai-go/v3` with a custom `WithBaseURL` option pointing to your API endpoint. The OpenAI-compatible API means the SDK works with any provider that supports the OpenAI format (e.g., OpenRouter). The SDK is wrapped in the `provider/` package (`provider.OpenAIClient`) which exposes a `Chat(ctx, prompt)` method and is injected into the service layer via the `LLMClient` interface.
 
 ### 9.3 System Prompt
 
@@ -289,9 +289,9 @@ Prompt should instruct:
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `PORT` | No | `8080` | HTTP server port |
-| `OPENROUTER_API_KEY` | Yes | — | OpenRouter API key |
-| `OPENROUTER_BASE_URL` | No | `https://openrouter.ai/api/v1` | OpenRouter API base URL |
-| `OPENROUTER_MODEL` | No | `openai/gpt-oss-120b` | LLM model to use |
+| `LLM_API_KEY` | Yes | — | API key for OpenAI-compatible LLM provider |
+| `LLM_BASE_URL` | No | `https://openrouter.ai/api/v1` | OpenAI-compatible API base URL |
+| `LLM_MODEL` | No | `openai/gpt-oss-120b` | LLM model to use |
 | `LLM_TIMEOUT` | No | `60s` | LLM call timeout (must be less than `SERVER_WRITE_TIMEOUT`) |
 | `FILTER_MODEL` | No | `meta-llama/llama-3.1-8b-instruct` | Fast model for prompt injection detection |
 | `FILTER_TIMEOUT` | No | `10s` | Filter LLM call timeout |
@@ -359,7 +359,7 @@ go fmt ./...          # Format code
 #### `config/config_test.go`
 - Load with defaults: all config values match expected defaults
 - Load with custom env: all config values match custom env vars
-- Missing API key: returns error containing "OPENROUTER_API_KEY"
+- Missing API key: returns error containing "LLM_API_KEY"
 - Invalid duration: returns error for malformed TTL
 - Invalid int: returns error for malformed burst value
 - Invalid float: returns error for malformed rate value

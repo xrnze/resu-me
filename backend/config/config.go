@@ -46,9 +46,9 @@ func Load() (*Config, error) {
 		log.Printf("no .env file loaded (expected in Docker): %v", err)
 	}
 
-	apiKey := os.Getenv("OPENROUTER_API_KEY")
+	apiKey := os.Getenv("LLM_API_KEY")
 	if apiKey == "" {
-		return nil, fmt.Errorf("OPENROUTER_API_KEY environment variable is required")
+		return nil, fmt.Errorf("LLM_API_KEY environment variable is required")
 	}
 
 	rateLimitRate, err := parseFloatEnv("RATE_LIMIT_RATE", 10)
@@ -112,8 +112,8 @@ func Load() (*Config, error) {
 		},
 		LLM: LLMConfig{
 			APIKey:        apiKey,
-			BaseURL:       getEnv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"),
-			Model:         getEnv("OPENROUTER_MODEL", "openai/gpt-oss-120b"),
+			BaseURL:       getEnv("LLM_BASE_URL", "https://openrouter.ai/api/v1"),
+			Model:         getEnv("LLM_MODEL", "openai/gpt-oss-120b"),
 			Timeout:       llmTimeout,
 			FilterModel:   getEnv("FILTER_MODEL", "meta-llama/llama-3.1-8b-instruct"),
 			FilterTimeout: filterTimeout,
