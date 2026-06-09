@@ -9,8 +9,8 @@ import (
 )
 
 func TestLoad_Defaults(t *testing.T) {
-	os.Setenv("OPENROUTER_API_KEY", "test-key")
-	defer os.Unsetenv("OPENROUTER_API_KEY")
+	os.Setenv("LLM_API_KEY", "test-key")
+	defer os.Unsetenv("LLM_API_KEY")
 
 	cfg, err := Load()
 	assert.NoError(t, err)
@@ -29,10 +29,10 @@ func TestLoad_Defaults(t *testing.T) {
 }
 
 func TestLoad_CustomEnv(t *testing.T) {
-	os.Setenv("OPENROUTER_API_KEY", "custom-key")
+	os.Setenv("LLM_API_KEY", "custom-key")
 	os.Setenv("PORT", "9090")
-	os.Setenv("OPENROUTER_BASE_URL", "https://custom.ai/v1")
-	os.Setenv("OPENROUTER_MODEL", "custom/model")
+	os.Setenv("LLM_BASE_URL", "https://custom.ai/v1")
+	os.Setenv("LLM_MODEL", "custom/model")
 	os.Setenv("RATE_LIMIT_RATE", "20")
 	os.Setenv("RATE_LIMIT_BURST", "5")
 	os.Setenv("RATE_LIMIT_TTL", "5m")
@@ -43,10 +43,10 @@ func TestLoad_CustomEnv(t *testing.T) {
 	os.Setenv("FILTER_TIMEOUT", "5s")
 	os.Setenv("SERVER_IDLE_TIMEOUT", "60s")
 	defer func() {
-		os.Unsetenv("OPENROUTER_API_KEY")
+		os.Unsetenv("LLM_API_KEY")
 		os.Unsetenv("PORT")
-		os.Unsetenv("OPENROUTER_BASE_URL")
-		os.Unsetenv("OPENROUTER_MODEL")
+		os.Unsetenv("LLM_BASE_URL")
+		os.Unsetenv("LLM_MODEL")
 		os.Unsetenv("LLM_TIMEOUT")
 		os.Unsetenv("FILTER_MODEL")
 		os.Unsetenv("FILTER_TIMEOUT")
@@ -76,17 +76,17 @@ func TestLoad_CustomEnv(t *testing.T) {
 }
 
 func TestLoad_MissingAPIKey(t *testing.T) {
-	os.Unsetenv("OPENROUTER_API_KEY")
+	os.Unsetenv("LLM_API_KEY")
 	_, err := Load()
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "OPENROUTER_API_KEY")
+	assert.Contains(t, err.Error(), "LLM_API_KEY")
 }
 
 func TestLoad_InvalidDuration(t *testing.T) {
-	os.Setenv("OPENROUTER_API_KEY", "test-key")
+	os.Setenv("LLM_API_KEY", "test-key")
 	os.Setenv("RATE_LIMIT_TTL", "not-a-duration")
 	defer func() {
-		os.Unsetenv("OPENROUTER_API_KEY")
+		os.Unsetenv("LLM_API_KEY")
 		os.Unsetenv("RATE_LIMIT_TTL")
 	}()
 
@@ -96,10 +96,10 @@ func TestLoad_InvalidDuration(t *testing.T) {
 }
 
 func TestLoad_InvalidInt(t *testing.T) {
-	os.Setenv("OPENROUTER_API_KEY", "test-key")
+	os.Setenv("LLM_API_KEY", "test-key")
 	os.Setenv("RATE_LIMIT_BURST", "not-an-int")
 	defer func() {
-		os.Unsetenv("OPENROUTER_API_KEY")
+		os.Unsetenv("LLM_API_KEY")
 		os.Unsetenv("RATE_LIMIT_BURST")
 	}()
 
@@ -109,10 +109,10 @@ func TestLoad_InvalidInt(t *testing.T) {
 }
 
 func TestLoad_InvalidFloat(t *testing.T) {
-	os.Setenv("OPENROUTER_API_KEY", "test-key")
+	os.Setenv("LLM_API_KEY", "test-key")
 	os.Setenv("RATE_LIMIT_RATE", "not-a-float")
 	defer func() {
-		os.Unsetenv("OPENROUTER_API_KEY")
+		os.Unsetenv("LLM_API_KEY")
 		os.Unsetenv("RATE_LIMIT_RATE")
 	}()
 
