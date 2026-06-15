@@ -7,7 +7,7 @@ import { AnalyzerNavbar } from "@/components/analyzer/AnalyzerNavbar";
 import { FileDropzone } from "@/components/analyzer/FileDropzone";
 import { JobDescriptionInput } from "@/components/analyzer/JobDescriptionInput";
 import { SubmitButton } from "@/components/analyzer/SubmitButton";
-import { LoadingOverlay } from "@/components/analyzer/LoadingOverlay";
+import { useLoadingTips } from "@/hooks/useLoadingTips";
 import { ResultsSection } from "@/components/analyzer/ResultsSection";
 
 export function AnalyzePage() {
@@ -16,6 +16,7 @@ export function AnalyzePage() {
   const [isExtracting, setIsExtracting] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [extractError, setExtractError] = useState("");
+  const { tip, start, clear } = useLoadingTips();
   const [results, setResults] = useState<AnalysisResponse | null>(null);
 
   const handleExtract = async (file: File) => {
@@ -42,6 +43,7 @@ export function AnalyzePage() {
 
   const handleSubmit = async () => {
     setIsAnalyzing(true);
+    start();
     try {
       const data = await analyzeResume(resumeText, jobDescription);
       setResults(data);
@@ -52,11 +54,13 @@ export function AnalyzePage() {
           : "Unable to reach the analysis server. Please try again.";
       toast.error(msg);
     } finally {
+      clear();
       setIsAnalyzing(false);
     }
   };
 
   const handleReset = () => {
+    clear();
     setResumeText("");
     setJobDescription("");
     setIsExtracting(false);
@@ -114,11 +118,11 @@ export function AnalyzePage() {
               <SubmitButton
                 disabled={!canSubmit}
                 loading={isAnalyzing}
+                tip={tip}
                 onClick={handleSubmit}
               />
             </div>
 
-            {isAnalyzing && <LoadingOverlay />}
           </div>
         )}
       </main>

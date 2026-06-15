@@ -4,23 +4,28 @@ interface SubmitButtonProps {
   disabled: boolean;
   loading: boolean;
   onClick: () => void;
+  tip: string;
 }
 
 export function SubmitButton({
   disabled,
   loading,
   onClick,
+  tip,
 }: SubmitButtonProps) {
   return (
     <button
       onClick={onClick}
       disabled={disabled || loading}
-      className={"btn-neo text-lg px-12 py-5"}
+      className="btn-neo text-lg px-12 py-5 min-w-[320px]"
     >
       {loading ? (
-        <span className="flex items-center gap-3">
+        <span
+          aria-live="polite"
+          className="flex items-center justify-center gap-3 font-['Space_Grotesk'] font-bold uppercase"
+        >
           <Loader2 size={20} className="animate-spin" />
-          Analyzing...
+          {tip}
         </span>
       ) : (
         "Analyze My Resume"
