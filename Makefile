@@ -1,4 +1,4 @@
-.PHONY: build-service build-frontend build run-service
+.PHONY: build-service build-frontend build run-service stop-service
 
 build-service:
 	$(MAKE) -C backend docker-build
@@ -10,3 +10,6 @@ build: build-service build-frontend
 
 run-service:
 	docker-compose up -d
+
+stop-service:
+	docker-compose down --remove-orphans

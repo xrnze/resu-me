@@ -58,6 +58,7 @@ services:
 
 networks:
   api:
+    name: resu-me
     driver: bridge
     ipam:
       config:
