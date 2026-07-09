@@ -7,7 +7,7 @@ export function TheProcess() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-xl">
           {/* Step 1: Upload */}
           <div className="flex flex-col items-center text-center space-y-md">
-            <div className="w-24 h-24 bg-primary-container border-4 border-black rounded-full flex items-center justify-center font-display-2xl text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <div className="w-24 h-24 bg-primary-container border-4 border-black rounded-none flex items-center justify-center font-headline-md text-headline-md text-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
               1
             </div>
             <h4 className="font-headline-md text-headline-md uppercase text-black">Upload</h4>
@@ -18,7 +18,7 @@ export function TheProcess() {
 
           {/* Step 2: Analyze */}
           <div className="flex flex-col items-center text-center space-y-md">
-            <div className="w-24 h-24 bg-tertiary-container border-4 border-black rounded-full flex items-center justify-center font-display-2xl text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <div className="w-24 h-24 bg-tertiary-container border-4 border-black rounded-none flex items-center justify-center font-headline-md text-headline-md text-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
               2
             </div>
             <h4 className="font-headline-md text-headline-md uppercase text-black">Analyze</h4>
@@ -29,7 +29,7 @@ export function TheProcess() {
 
           {/* Step 3: Conquer */}
           <div className="flex flex-col items-center text-center space-y-md">
-            <div className="w-24 h-24 bg-secondary-fixed border-4 border-black rounded-full flex items-center justify-center font-display-2xl text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <div className="w-24 h-24 bg-secondary-fixed border-4 border-black rounded-none flex items-center justify-center font-headline-md text-headline-md text-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
               3
             </div>
             <h4 className="font-headline-md text-headline-md uppercase text-black">Conquer</h4>
