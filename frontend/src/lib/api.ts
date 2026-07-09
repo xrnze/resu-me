@@ -1,4 +1,10 @@
 import type { AnalysisRequest, AnalysisResponse } from "@/types";
+import {
+  ERROR_MESSAGES,
+  NETWORK_ERROR_MESSAGE,
+  STATUS_MESSAGES,
+  UNKNOWN_ERROR_MESSAGE,
+} from "./error-messages";
 
 const USE_MOCK = false;
 const MOCK_DELAY = 1500;
@@ -39,21 +45,29 @@ export async function analyzeResume(
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const url = backendUrl ? `http://${backendUrl}/` : "";
 
-  const res = await fetch(url + "api/analyze", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-    signal,
-  });
+  let res: Response;
+
+  try {
+    res = await fetch(url + "api/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      signal,
+    });
+  } catch (e) {
+    if (e instanceof DOMException && e.name === "AbortError") throw e;
+    throw new Error(NETWORK_ERROR_MESSAGE, { cause: e });
+  }
 
   if (!res.ok) {
-    const msg = await res
-      .json()
-      .then((d) => d.message)
-      .catch(() => "");
-    throw new Error(
-      msg || `Analysis failed (${res.status}). Please try again later.`,
-    );
+    const body = await res.json().catch(() => ({}));
+    const code = body?.error?.code ?? "";
+    const msg =
+      ERROR_MESSAGES[code] ??
+      STATUS_MESSAGES[res.status] ??
+      body?.error?.message ??
+      UNKNOWN_ERROR_MESSAGE;
+    throw new Error(msg);
   }
 
   return res.json() as Promise<AnalysisResponse>;

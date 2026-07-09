@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Toaster, toast } from "sonner";
+import { Toaster } from "sonner";
 import { extractText } from "@/lib/extract-text";
 import { analyzeResume } from "@/lib/api";
 import type { AnalysisResponse } from "@/types";
@@ -9,6 +9,7 @@ import { JobDescriptionInput } from "@/components/analyzer/JobDescriptionInput";
 import { SubmitButton } from "@/components/analyzer/SubmitButton";
 import { useLoadingTips } from "@/hooks/useLoadingTips";
 import { ResultsSection } from "@/components/analyzer/ResultsSection";
+import { ErrorAlert } from "@/components/analyzer/ErrorAlert";
 
 export function AnalyzePage() {
   const [resumeText, setResumeText] = useState("");
@@ -18,6 +19,7 @@ export function AnalyzePage() {
   const [extractError, setExtractError] = useState("");
   const { tip, start, clear } = useLoadingTips();
   const [results, setResults] = useState<AnalysisResponse | null>(null);
+  const [analyzeError, setAnalyzeError] = useState<string | null>(null);
 
   const handleExtract = async (file: File) => {
     setIsExtracting(true);
@@ -43,6 +45,7 @@ export function AnalyzePage() {
 
   const handleSubmit = async () => {
     setIsAnalyzing(true);
+    setAnalyzeError(null);
     start();
     try {
       const data = await analyzeResume(resumeText, jobDescription);
@@ -52,12 +55,14 @@ export function AnalyzePage() {
         e instanceof Error
           ? e.message
           : "Unable to reach the analysis server. Please try again.";
-      toast.error(msg);
+      setAnalyzeError(msg);
     } finally {
       clear();
       setIsAnalyzing(false);
     }
   };
+
+  const handleDismissError = () => setAnalyzeError(null);
 
   const handleReset = () => {
     clear();
@@ -66,6 +71,7 @@ export function AnalyzePage() {
     setIsExtracting(false);
     setIsAnalyzing(false);
     setExtractError("");
+    setAnalyzeError(null);
     setResults(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -113,6 +119,10 @@ export function AnalyzePage() {
               value={jobDescription}
               onChange={setJobDescription}
             />
+
+            {analyzeError && (
+              <ErrorAlert message={analyzeError} onDismiss={handleDismissError} />
+            )}
 
             <div className="flex justify-center">
               <SubmitButton
