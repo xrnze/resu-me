@@ -9,7 +9,7 @@ export function HeroSection() {
       <div className="flex-1 space-y-md">
         <h1 className="font-display-2xl text-display-2xl uppercase italic tracking-tighter text-black">
           REWRITE YOUR FUTURE.{" "}
-          <span className="bg-black text-primary-container px-4">
+          <span className="bg-black text-primary px-4">
             NO MERCY.
           </span>
         </h1>
