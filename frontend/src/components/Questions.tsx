@@ -40,7 +40,7 @@ export function Questions() {
           return (
             <div
               key={index}
-              className={`border-4 border-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${
+              className={`border-4 border-black p-6 neobrutal-shadow ${
                 isOpen ? "bg-primary-container" : "bg-white"
               }`}
             >

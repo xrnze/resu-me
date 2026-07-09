@@ -28,7 +28,7 @@ export function HeroSection() {
         </div>
       </div>
       <div className="flex-1 w-full md:flex justify-end hidden">
-        <div className="w-full max-w-120 aspect-square bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden relative">
+        <div className="w-full max-w-120 aspect-square bg-white border-4 border-black neobrutal-shadow overflow-hidden relative">
           <img
             alt="A high-contrast, neobrutalist digital illustration of a stylized paper resume being scanned by glowing laser lines."
             className="w-full h-full object-cover grayscale contrast-125"

@@ -3,7 +3,7 @@ import { ArrowLeft } from "lucide-react";
 
 export function AnalyzerNavbar() {
   return (
-    <header className="sticky top-0 w-full border-b-4 border-black z-50 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex justify-between items-center h-20 px-6 md:px-12">
+    <header className="sticky top-0 w-full border-b-4 border-black z-50 bg-white neobrutal-shadow flex justify-between items-center h-20 px-6 md:px-12">
       <Link
         to="/"
         className="flex items-center gap-2 font-['Space_Grotesk'] font-bold text-black"

@@ -6,7 +6,7 @@ export function Features() {
       <h2 className="font-headline-lg text-headline-lg uppercase text-black mb-lg">Features</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-md">
         {/* Card 1: Keyword Gap Analysis */}
-        <div className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col">
+        <div className="bg-white border-4 border-black neobrutal-shadow flex flex-col">
           <div className="h-16 bg-tertiary-container border-b-4 border-black flex items-center px-4">
             <span className="text-black"><Search size={28} /></span>
           </div>
@@ -19,7 +19,7 @@ export function Features() {
         </div>
 
         {/* Card 2: Section Feedback */}
-        <div className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col">
+        <div className="bg-white border-4 border-black neobrutal-shadow flex flex-col">
           <div className="h-16 bg-primary-container border-b-4 border-black flex items-center px-4">
             <span className="text-black"><ListChecks size={28} /></span>
           </div>
@@ -32,7 +32,7 @@ export function Features() {
         </div>
 
         {/* Card 3: Rewrite Suggestions */}
-        <div className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col">
+        <div className="bg-white border-4 border-black neobrutal-shadow flex flex-col">
           <div className="h-16 bg-secondary-fixed border-b-4 border-black flex items-center px-4">
             <span className="text-black"><PenLine size={28} /></span>
           </div>

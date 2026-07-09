@@ -17,7 +17,7 @@ export function SubmitButton({
     <button
       onClick={onClick}
       disabled={disabled || loading}
-      className="btn-neo text-lg px-12 py-5 min-w-[320px]"
+      className="btn-neo text-lg px-12 py-5 min-w-80"
     >
       {loading ? (
         <span

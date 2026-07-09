@@ -8,7 +8,7 @@ export function SuccessStories() {
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
         {/* Mark R. */}
-        <div className="bg-white border-4 border-black p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] space-y-sm">
+        <div className="bg-white border-4 border-black p-8 neobrutal-shadow space-y-sm">
           <div className="flex items-center gap-sm">
             <div className="w-16 h-16 border-4 border-black overflow-hidden bg-tertiary-container">
               <img
@@ -37,7 +37,7 @@ export function SuccessStories() {
         </div>
 
         {/* Sarah L. */}
-        <div className="bg-white border-4 border-black p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] space-y-sm">
+        <div className="bg-white border-4 border-black p-8 neobrutal-shadow space-y-sm">
           <div className="flex items-center gap-sm">
             <div className="w-16 h-16 border-4 border-black overflow-hidden bg-primary-container">
               <img

@@ -16,7 +16,7 @@ export function ScoreDisplay({ score }: ScoreDisplayProps) {
       <h2 className="font-headline-md font-bold text-sm uppercase text-on-surface-variant mb-4">
         Overall Match Score
       </h2>
-      <div className={`inline-flex items-center justify-center w-32 h-32 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${colorClass}`}>
+      <div className={`inline-flex items-center justify-center w-32 h-32 border-4 border-black neobrutal-shadow ${colorClass}`}>
         <span className="font-headline-md text-4xl font-black text-black tracking-tighter">
           {score}
         </span>

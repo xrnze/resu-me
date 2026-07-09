@@ -7,11 +7,11 @@ This design system is based on the Stitch-generated "Resume Engine" landing page
 
 | Token | Hex | Usage |
 |-------|-----|-------|
-| Primary | `#FFE600` | CTAs, highlights, score gauges, hero accent |
-| Secondary | `#FF00F5` | Hover states, accent tags, secondary elements |
-| Tertiary | `#00F0FF` | Links, info tags, technical data |
+| Primary | `#ffe600` | CTAs, highlights, score gauges, hero accent |
+| Secondary | `#ff00f5` | Hover states, accent tags, secondary elements |
+| Tertiary | `#00f0ff` | Links, info tags, technical data |
 | Black | `#000000` | Borders, shadows, text, heavy elements |
-| White | `#FFFFFF` | Card backgrounds |
+| White | `#ffffff` | Card backgrounds |
 | Surface | `#f9f9f9` | Page background |
 | Card | `#ffffff` | Card backgrounds (same as white) |
 | Text | `#1b1b1b` | Primary text |
@@ -46,9 +46,7 @@ This design system is based on the Stitch-generated "Resume Engine" landing page
 
 - **Border width**: 4px solid black (primary elements)
 - **Border radius**: 0px (sharp corners - neobrutalist)
-- **Shadows**: Hard offset, no blur
-  - Small elements: 4px 4px 0 0 #000
-  - Standard elements: 8px 8px 0 0 #000
+- **Shadows**: Hard offset, no blur. Single `4px 4px 0 0 #000` used on every shadowed element.
 
 ## Components
 
@@ -58,9 +56,8 @@ This design system is based on the Stitch-generated "Resume Engine" landing page
 - Background: primary (#FFE600)
 - Text: black, bold, uppercase
 - Border: 4px solid black
-- Shadow: 8px 8px 0 0 #000
-- Hover: translate(2px, 2px), shadow 6px 6px 0 0
-- Active: translate(4px, 4px), shadow 4px 4px 0 0
+- Shadow: 4px 4px 0 0 #000
+- Pressed (hover/active): translate(4px, 4px), shadow 0 0 0 0
 
 **Secondary**:
 - Background: white
@@ -71,7 +68,7 @@ This design system is based on the Stitch-generated "Resume Engine" landing page
 ### Cards (card-neo)
 - Background: white (#ffffff)
 - Border: 4px solid black
-- Shadow: 8px 8px 0 0 #000
+- Shadow: 4px 4px 0 0 #000
 - Padding: 32px (p-8)
 
 ### Tags (tag-neo)
@@ -96,7 +93,7 @@ This design system is based on the Stitch-generated "Resume Engine" landing page
 ## Implementation Notes
 
 1. All components use Tailwind CSS utilities
-2. Custom utilities defined in `@layer components` in index.css
+2. Custom utilities defined with `@utility` and component classes in `@layer components` in index.css
 3. Self-hosted fonts in public/fonts/
 4. No inline styles - all utility classes
 5. Brutalist toggle: instant (no animation)

@@ -15,13 +15,13 @@
 }
 
 @theme {
-  --color-primary: #FFE600;
+  --color-primary: #ffe600;
   --color-primary-container: #ffdab9;
-  --color-secondary: #FF00F5;
-  --color-secondary-container: #FF00F5;
-  --color-secondary-fixed: #FF00F5;
-  --color-tertiary: #00F0FF;
-  --color-tertiary-container: #00F0FF;
+  --color-secondary: #ff00f5;
+  --color-secondary-container: #ff00f5;
+  --color-secondary-fixed: #ff00f5;
+  --color-tertiary: #00f0ff;
+  --color-tertiary-container: #00f0ff;
   --color-surface: #f9f9f9;
   --color-surface-dim: #dadada;
   --color-surface-bright: #f9f9f9;
@@ -117,27 +117,20 @@ h6 {
   @apply font-bold tracking-tight;
 }
 
+@utility neobrutal-shadow {
+  @apply shadow-[4px_4px_0_#000000];
+}
+
 @layer components {
-  .neobrutal-shadow {
-    @apply shadow-[8px_8px_0_#000000];
-  }
-
-  .neobrutal-shadow-sm {
-    @apply shadow-[4px_4px_0_#000000];
-  }
-
-  .neobrutal-shadow-btn:active {
-    @apply shadow-[0px_0px_0_#000000] translate-x-1 translate-y-1;
-  }
 
   .btn-neo {
-    @apply inline-flex items-center justify-center px-8 py-4 text-base font-bold uppercase tracking-wide bg-primary text-black border-4 border-black shadow-[8px_8px_0_#000000] cursor-pointer transition-all duration-100 ease-in-out;
+    @apply neobrutal-shadow inline-flex items-center justify-center px-8 py-4 text-base font-bold uppercase tracking-wide bg-primary text-black border-4 border-black cursor-pointer transition-all duration-100 ease-in-out;
     font-family: var(--font-headline-md);
   }
 
   .btn-neo:hover:not(:disabled),
   .btn-neo:active:not(:disabled) {
-    @apply shadow-[0_0_0_#000000] translate-x-2 translate-y-2;
+    @apply shadow-[0_0_0_#000000] translate-x-[4px] translate-y-[4px];
   }
 
   .btn-neo:disabled {
@@ -145,7 +138,7 @@ h6 {
   }
 
   .card-neo {
-    @apply bg-card border-4 border-black p-8 shadow-[8px_8px_0_#000000];
+    @apply neobrutal-shadow bg-card border-4 border-black p-8;
   }
 
   .tag-neo {
@@ -162,7 +155,7 @@ h6 {
   }
 
   .text-link-neo::after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: -3px;
     left: 0;
