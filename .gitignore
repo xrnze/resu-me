@@ -4,3 +4,5 @@
 *.pem
 *.key
 traefik/acme.json
+PLAN*.md
+CONTEXT.md

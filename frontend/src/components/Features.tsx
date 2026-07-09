@@ -1,3 +1,5 @@
+import { Search, ListChecks, PenLine } from 'lucide-react';
+
 export function Features() {
   return (
     <section id="features" className="px-8 md:px-16 py-xl bg-surface">
@@ -6,7 +8,7 @@ export function Features() {
         {/* Card 1: Keyword Gap Analysis */}
         <div className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col">
           <div className="h-16 bg-tertiary-container border-b-4 border-black flex items-center px-4">
-            <span className="material-symbols-outlined text-black text-3xl">manage_search</span>
+            <span className="text-black"><Search size={28} /></span>
           </div>
           <div className="p-8 space-y-sm flex-1">
             <h3 className="font-headline-md text-headline-md uppercase text-black">Keyword Gap Analysis</h3>
@@ -19,7 +21,7 @@ export function Features() {
         {/* Card 2: Section Feedback */}
         <div className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col">
           <div className="h-16 bg-primary-container border-b-4 border-black flex items-center px-4">
-            <span className="material-symbols-outlined text-black text-3xl">rate_review</span>
+            <span className="text-black"><ListChecks size={28} /></span>
           </div>
           <div className="p-8 space-y-sm flex-1">
             <h3 className="font-headline-md text-headline-md uppercase text-black">Section Feedback</h3>
@@ -32,7 +34,7 @@ export function Features() {
         {/* Card 3: Rewrite Suggestions */}
         <div className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col">
           <div className="h-16 bg-secondary-fixed border-b-4 border-black flex items-center px-4">
-            <span className="material-symbols-outlined text-black text-3xl">edit_note</span>
+            <span className="text-black"><PenLine size={28} /></span>
           </div>
           <div className="p-8 space-y-sm flex-1">
             <h3 className="font-headline-md text-headline-md uppercase text-black">Rewrite Suggestions</h3>

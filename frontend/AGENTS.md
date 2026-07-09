@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-A single-page web application that allows job seekers to upload their resume (PDF/DOCX), paste a target job description, and submit both to a backend analysis service. The frontend displays an overall match score and structured improvement suggestions in a clean, dark-first UI inspired by Vercel and Linear.
+A single-page web application that allows job seekers to upload their resume (PDF/DOCX), paste a target job description, and submit both to a backend analysis service. The frontend displays an overall match score and structured improvement suggestions in a clean, clean neobrutalist layout (see `DESIGN.md`).
 
 ## 2. Goals
 
@@ -39,12 +39,12 @@ A single-page web application that allows job seekers to upload their resume (PD
 
 ## 5. Feature Specification
 
-### 5.1 Theme System (Dark-First)
+### 5.1 Theme System (Light-First)
 
-- **Default**: Dark mode.
-- **Toggle**: Manual switch in the header (sun/moon icon) that overrides `prefers-color-scheme`.
+- **Default**: Light mode (`--color-surface: #f9f9f9`, white cards).
+- **Toggle**: Manual switch in the header (sun/moon icon) that overrides the default.
 - **Persistence**: Selected theme stored in `localStorage` (`theme: 'dark' | 'light'`).
-- **Implementation**: A single `ThemeContext` provides the current theme and toggle function. The `<html>` element receives a `.light` class when active. All colors are CSS custom properties in `index.css`.
+- **Implementation**: A single `ThemeContext` provides the current theme and toggle function. All colors are defined as CSS custom properties in `index.css` via a `@theme` block. No `dark:` variant classes are used — the theme tokens in `@theme` represent the light palette.
 
 ### 5.2 Landing / Hero Section
 
@@ -121,7 +121,7 @@ Triggered on successful `200 OK` from backend. Displays the response shape:
 
 **Error Handling**:
 
-- **Network error / Backend error**: Global toast via `sonner`: "Unable to reach the analysis server. Please try again."
+- **Network error / Backend error**: Inline error via `ErrorAlert` component: "Unable to reach the analysis server. Please try again."
 - **File extraction error**: Inline error below dropzone: "Could not read this file. Please try another PDF or DOCX."
 
 ### 5.6 Navigation / Reset
@@ -154,7 +154,6 @@ Triggered on successful `200 OK` from backend. Displays the response shape:
 | PDF Parsing | `pdfjs-dist` | ✅ Existing |
 | DOCX Parsing | `mammoth` | ✅ Existing |
 | Icons | `lucide-react` | ✅ Existing |
-| Toasts | `sonner` | ✅ Existing |
 
 ### 7.2 State Management
 
@@ -256,7 +255,7 @@ src/
 3. User types job description → `JobDescriptionInput` calls `onChange` → `setJobDescription()`.
 4. User clicks submit → `handleSubmit()` calls `analyzeResume(resumeText, jobDescription)` from `lib/api.ts`.
 5. On success: `AnalyzePage` calls `setResults(data)` and renders `ResultsSection`.
-6. On error: `sonner` toast displays error message.
+6. On error: inline `ErrorAlert` component displays error message.
 7. "Analyze Another Resume" clears all state via `handleReset()`.
 
 ### 7.6 Theme Implementation Detail
@@ -332,7 +331,7 @@ interface AnalysisResponse {
 - Color contrast meets WCAG AA.
 - Loading states announced via `aria-live="polite"`.
 - Results sections use semantic headings (`<h2>`, `<h3>`).
-- Toasts from `sonner` are screen-reader friendly by default.
+- Error states use a `role="alert"` element with `aria-live="assertive"` via the `ErrorAlert` component.
 
 ## 10. Performance
 

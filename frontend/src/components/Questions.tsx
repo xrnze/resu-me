@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Plus, Minus } from 'lucide-react';
 
 const questions = [
   {
@@ -50,8 +51,8 @@ export function Questions() {
                 <h4 className="font-headline-md text-headline-md uppercase text-black">
                   {q.question}
                 </h4>
-                <span className="material-symbols-outlined text-4xl text-black">
-                  {isOpen ? "remove" : "add"}
+                <span className="text-4xl text-black">
+                  {isOpen ? <Minus size={36} /> : <Plus size={36} />}
                 </span>
               </div>
               {isOpen && q.answer && (

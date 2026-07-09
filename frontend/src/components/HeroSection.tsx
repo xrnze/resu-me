@@ -2,7 +2,10 @@ import { Link } from "@tanstack/react-router";
 
 export function HeroSection() {
   return (
-    <section className="bg-primary-container px-8 md:px-16 py-xl border-b-4 border-black flex flex-col md:flex-row items-center gap-md">
+    <section
+      id="hero"
+      className="bg-white px-8 md:px-16 py-xl border-b-4 border-black flex flex-col md:flex-row items-center gap-md"
+    >
       <div className="flex-1 space-y-md">
         <h1 className="font-display-2xl text-display-2xl uppercase italic tracking-tighter text-black">
           REWRITE YOUR FUTURE.{" "}
@@ -18,7 +21,7 @@ export function HeroSection() {
         <div className="flex gap-sm">
           <Link
             to="/analyze"
-            className="bg-secondary-container text-black font-headline-md text-headline-md px-10 py-6 border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] uppercase transition-all inline-block cursor-pointer"
+            className="btn-neo font-headline-md text-headline-md px-10 py-6"
           >
             ANALYZE NOW
           </Link>

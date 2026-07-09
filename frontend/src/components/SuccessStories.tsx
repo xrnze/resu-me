@@ -1,6 +1,8 @@
+import { Star } from "lucide-react";
+
 export function SuccessStories() {
   return (
-    <section id="reviews" className="px-8 md:px-16 py-xl bg-[#E0BBE4]">
+    <section id="reviews" className="px-8 md:px-16 py-xl bg-white">
       <h2 className="font-headline-lg text-headline-lg uppercase text-black mb-lg">
         Success Stories
       </h2>
@@ -19,37 +21,12 @@ export function SuccessStories() {
               <p className="font-label-bold uppercase text-black">
                 MARK R. — Senior Developer
               </p>
-              <div className="flex text-black">
-                <span
-                  className="material-symbols-outlined"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
-                  star
-                </span>
-                <span
-                  className="material-symbols-outlined"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
-                  star
-                </span>
-                <span
-                  className="material-symbols-outlined"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
-                  star
-                </span>
-                <span
-                  className="material-symbols-outlined"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
-                  star
-                </span>
-                <span
-                  className="material-symbols-outlined"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
-                  star
-                </span>
+              <div className="flex text-black gap-0.5">
+                <Star size={18} fill="currentColor" />
+                <Star size={18} fill="currentColor" />
+                <Star size={18} fill="currentColor" />
+                <Star size={18} fill="currentColor" />
+                <Star size={18} fill="currentColor" />
               </div>
             </div>
           </div>
@@ -73,37 +50,12 @@ export function SuccessStories() {
               <p className="font-label-bold uppercase text-black">
                 SARAH L. — Marketing Lead
               </p>
-              <div className="flex text-black">
-                <span
-                  className="material-symbols-outlined"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
-                  star
-                </span>
-                <span
-                  className="material-symbols-outlined"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
-                  star
-                </span>
-                <span
-                  className="material-symbols-outlined"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
-                  star
-                </span>
-                <span
-                  className="material-symbols-outlined"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
-                  star
-                </span>
-                <span
-                  className="material-symbols-outlined"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
-                  star
-                </span>
+              <div className="flex text-black gap-0.5">
+                <Star size={18} fill="currentColor" />
+                <Star size={18} fill="currentColor" />
+                <Star size={18} fill="currentColor" />
+                <Star size={18} fill="currentColor" />
+                <Star size={18} fill="currentColor" />
               </div>
             </div>
           </div>

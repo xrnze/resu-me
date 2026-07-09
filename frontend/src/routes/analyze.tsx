@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Toaster } from "sonner";
 import { extractText } from "@/lib/extract-text";
 import { analyzeResume } from "@/lib/api";
 import type { AnalysisResponse } from "@/types";
@@ -82,16 +81,6 @@ export function AnalyzePage() {
   return (
     <div className="min-h-screen flex flex-col bg-surface">
       <AnalyzerNavbar />
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          style: {
-            border: "2px solid black",
-            borderRadius: "0",
-            fontFamily: "Work Sans, system-ui, sans-serif",
-          },
-        }}
-      />
       <main className="flex-1 w-full max-w-4xl mx-auto px-6 py-12">
         {results ? (
           <ResultsSection results={results} onReset={handleReset} />
