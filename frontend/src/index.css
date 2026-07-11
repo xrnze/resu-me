@@ -68,6 +68,7 @@
 
 html {
   @apply scroll-smooth;
+  scroll-padding-top: 6rem;
 }
 
 body {
